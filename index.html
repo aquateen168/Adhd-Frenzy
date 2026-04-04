@@ -8,30 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        
-        body {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1133 100%);
-            color: white;
-            font-family: 'VT323', monospace;
-        }
-        
-        .card {
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .card:hover {
-            transform: scale(1.08) rotate(1deg);
-            box-shadow: 0 0 40px rgba(255, 235, 59, 0.7);
-        }
-        
-        .modal {
-            animation: modalPop 0.3s ease-out;
-        }
-        
-        @keyframes modalPop {
-            from { transform: scale(0.7); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e1133 100%); color: white; font-family: 'VT323', monospace; }
+        .card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card:hover { transform: scale(1.08) rotate(1deg); box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); }
+        .modal { animation: modalPop 0.3s ease-out; }
+        @keyframes modalPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -44,18 +25,15 @@
                     <p class="text-xs text-yellow-400 tracking-[4px]">SERIES 1 • 100 CARDS</p>
                 </div>
             </div>
-            
             <nav class="flex gap-8 text-xl">
                 <a onclick="navigate(0)" class="cursor-pointer hover:text-yellow-400">HOME</a>
                 <a onclick="navigate(1)" class="cursor-pointer hover:text-yellow-400">COLLECTION</a>
                 <a onclick="navigate(2)" class="cursor-pointer hover:text-yellow-400">OPEN PACK</a>
                 <a onclick="navigate(3)" class="cursor-pointer hover:text-yellow-400">ALL CARDS</a>
             </nav>
-            
             <div class="flex items-center gap-3">
                 <div id="timerDisplay" class="bg-black/80 px-4 py-2 rounded-2xl border-2 border-yellow-400 text-yellow-300 text-xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-clock"></i>
-                    <span id="timeLeft">10:00</span>
+                    <i class="fa-solid fa-clock"></i> <span id="timeLeft">10:00</span>
                 </div>
                 <button onclick="claimDailyPack()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-3xl text-xl flex items-center gap-3">
                     <i class="fa-solid fa-bee"></i> OPEN PACK
@@ -65,7 +43,6 @@
     </header>
 
     <div id="pageContainer" class="max-w-6xl mx-auto px-6 pt-8">
-        
         <!-- HOME -->
         <div id="page-0" class="page">
             <div class="text-center py-20">
@@ -86,7 +63,6 @@
             <div class="text-center py-12">
                 <h2 class="text-6xl mb-4">OPEN A PACK</h2>
                 <p class="text-3xl text-yellow-300 mb-12">5 cards • Every 10 minutes • No duplicates in one pack</p>
-                
                 <div id="packArea" onclick="if(!isOnCooldown) openPack()" 
                      class="cursor-pointer pack mx-auto w-96 h-96 border-8 border-yellow-400 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center text-9xl shadow-2xl">
                     <div class="text-center">
@@ -94,7 +70,6 @@
                         <div class="text-white text-4xl font-bold">CLICK TO OPEN</div>
                     </div>
                 </div>
-
                 <div id="openedPack" class="hidden mt-12 grid grid-cols-5 gap-6"></div>
             </div>
         </div>
@@ -121,28 +96,28 @@
     </div>
 
     <script>
-        // REPLACE YOURUSERNAME WITH YOUR ACTUAL GITHUB USERNAME
-        const USERNAME = "aquateen168";   // ← CHANGE THIS
+        const USERNAME = "aquateen168";   // ← CHANGE THIS TO YOUR EXACT GITHUB USERNAME IF DIFFERENT
 
         const allCards = [
-            { id: "god-rare", name: "The Ultimate Trip", number: "Special / Ultra Rare - DMT Edition", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/God Rare.jpg` },
-            { id: "0-0-100", name: "The Meaning of You (Human)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/0.0.100.jpg` },
-            { id: "0-1-100", name: "The Meaning of You (Spiritual)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/0.1.100.jpg` },
-            { id: "0-2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/0.2.100.jpg` },
-            { id: "0-3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/0.3.100.jpg` },
-            { id: "0-4-100", name: "The Meaning of You (Festival)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/0.4.100.jpg` },
-            { id: "1-100", name: "The Meaning of Life is Beautiful", number: "22/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/1.100.jpg` },
-            { id: "2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/2.100.jpg` },
-            { id: "3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/3.100.jpg` },
-            { id: "4-100", name: "The Meaning of You", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/4.100.jpg` },
-            { id: "5-100", name: "The Meaning of Atlanta", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/5.jpg` },
-            { id: "5-skate", name: "Skate Zone - Morrow, GA", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/5.jpg` },
-            { id: "6-plaza", name: "The Plaza Theatre", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/6.jpg` },
-            { id: "7-varsity", name: "The Varsity - Atlanta", number: "7/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/7.jpg` },
-            { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/8.jpg` },
-            { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/9.jpg` },
-            { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/back.jpg` },
-            { id: "7-alt", name: "The Plaza Theatre (Alt)", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/main/cards/7 Alt.jpg` }
+            { id: "god-rare", name: "The Ultimate Trip", number: "Special / Ultra Rare - DMT Edition", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/God Rare.jpg` },
+            { id: "0-0-100", name: "The Meaning of You (Human)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.0.100.jpg` },
+            { id: "0-1-100", name: "The Meaning of You (Spiritual)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.1.100.jpg` },
+            { id: "0-2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.2.100.jpg` },
+            { id: "0-3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.3.100.jpg` },
+            { id: "0-4-100", name: "The Meaning of You (Festival)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.4.100.jpg` },
+            { id: "1-100", name: "The Meaning of Life is Beautiful", number: "22/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/1.100.jpg` },
+            { id: "2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/2.100.jpg` },
+            { id: "3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/3.100.jpg` },
+            { id: "4-100", name: "The Meaning of You", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/4.100.jpg` },
+            { id: "5-100", name: "The Meaning of Atlanta", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/5.jpg` },
+            { id: "5-skate", name: "Skate Zone - Morrow, GA", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/5.jpg` },
+            { id: "6-plaza", name: "The Plaza Theatre", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/6.jpg` },
+            { id: "7-varsity", name: "The Varsity - Atlanta", number: "7/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/7.jpg` },
+            { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/8.jpg` },
+            { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/9.jpg` },
+            { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/back.jpg` },
+            { id: "7-alt", name: "The Plaza Theatre (Alt)", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/7 Alt.jpg` },
+            { id: "god-rare-alt", name: "God Rare (Alt)", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/God Rare_alt.jpg` }
         ];
 
         let collection = JSON.parse(localStorage.getItem('miyagiCollection')) || [];
@@ -174,11 +149,9 @@
                 alert("⏳ Wait 10 minutes for the next DMT Express run!");
                 return;
             }
-
             isOnCooldown = true;
             const packArea = document.getElementById('packArea');
             const openedArea = document.getElementById('openedPack');
-            
             packArea.classList.add('hidden');
             openedArea.classList.remove('hidden');
             openedArea.innerHTML = '<div class="col-span-5 text-center py-12 text-4xl">UNPACKING FROM THE TUNNEL...</div>';
@@ -186,24 +159,21 @@
             setTimeout(() => {
                 const shuffled = [...allCards].sort(() => 0.5 - Math.random());
                 const packCards = shuffled.slice(0, 5);
-                
                 openedArea.innerHTML = '';
                 packCards.forEach(card => {
                     const div = document.createElement('div');
                     div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer`;
                     div.innerHTML = `
-                        <img src="${card.image}" class="w-full aspect-[5/7] object-cover">
+                        <img src="${card.image}" class="w-full aspect-[5/7] object-cover" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Image+Missing'">
                         <div class="p-4 text-center">
-                            <div class="text-xl font-bold">${card.name}</div>
-                            <div class="text-yellow-300 text-sm">${card.number}</div>
+                            <div class="text-xl">${card.name}</div>
+                            <div class="text-yellow-300">${card.number}</div>
                         </div>
                     `;
                     div.onclick = () => showCardModal(card);
                     openedArea.appendChild(div);
-                    
                     if (!collection.includes(card.id)) collection.push(card.id);
                 });
-                
                 localStorage.setItem('miyagiCollection', JSON.stringify(collection));
                 lastPackTime = Date.now();
                 localStorage.setItem('lastPackTime', lastPackTime);
@@ -227,18 +197,14 @@
 
         function renderCollection() {
             const grid = document.getElementById('collectionGrid');
-            grid.innerHTML = '';
-            if (collection.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-20 text-4xl text-yellow-300">No cards collected yet.<br>Open some packs!</div>`;
-                return;
-            }
+            grid.innerHTML = collection.length ? '' : `<div class="col-span-full text-center py-20 text-4xl text-yellow-300">No cards yet… open packs!</div>`;
             collection.forEach(id => {
                 const card = allCards.find(c => c.id === id);
                 if (!card) return;
                 const div = document.createElement('div');
                 div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer`;
                 div.innerHTML = `
-                    <img src="${card.image}" class="w-full aspect-[5/7] object-cover">
+                    <img src="${card.image}" class="w-full aspect-[5/7] object-cover" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Image+Missing'">
                     <div class="p-4 text-center">
                         <div class="text-xl">${card.name}</div>
                         <div class="text-yellow-300">${card.number}</div>
@@ -256,7 +222,7 @@
                 const div = document.createElement('div');
                 div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer`;
                 div.innerHTML = `
-                    <img src="${card.image}" class="w-full aspect-[5/7] object-cover">
+                    <img src="${card.image}" class="w-full aspect-[5/7] object-cover" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Image+Missing'">
                     <div class="p-4 text-center">
                         <div class="text-xl">${card.name}</div>
                         <div class="text-yellow-300">${card.number}</div>
