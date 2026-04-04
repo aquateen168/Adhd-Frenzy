@@ -11,6 +11,8 @@
         body { background: linear-gradient(135deg, #0f172a 0%, #1e1133 100%); color: white; font-family: 'VT323', monospace; }
         .card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         .card:hover { transform: scale(1.08) rotate(1deg); box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); }
+        .modal { animation: modalPop 0.3s ease-out; }
+        @keyframes modalPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -31,13 +33,10 @@
             </nav>
             <div class="flex items-center gap-3">
                 <div id="timerDisplay" class="bg-black/80 px-4 py-2 rounded-2xl border-2 border-yellow-400 text-yellow-300 text-xl font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-clock"></i> <span id="timeLeft">READY!</span>
+                    <i class="fa-solid fa-clock"></i> <span id="timeLeft">10:00</span>
                 </div>
                 <button onclick="claimDailyPack()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-3xl text-xl flex items-center gap-3">
                     <i class="fa-solid fa-bee"></i> OPEN PACK
-                </button>
-                <button onclick="resetTimer()" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-3 rounded-3xl text-sm">
-                    🔄 RESET TIMER
                 </button>
             </div>
         </div>
@@ -60,12 +59,12 @@
         </div>
 
         <!-- PACK OPENER -->
-        <div id="page-2" class="page">
+        <div id="page-2" class="page hidden">
             <div class="text-center py-12">
                 <h2 class="text-6xl mb-4">OPEN A PACK</h2>
-                <p class="text-3xl text-yellow-300 mb-12">5 cards • Click below to test</p>
-                <div onclick="openPack()" 
-                     class="cursor-pointer mx-auto w-96 h-96 border-8 border-yellow-400 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center text-9xl shadow-2xl">
+                <p class="text-3xl text-yellow-300 mb-12">5 cards • Every 10 minutes • No duplicates in one pack</p>
+                <div id="packArea" onclick="if(!isOnCooldown) openPack()" 
+                     class="cursor-pointer pack mx-auto w-96 h-96 border-8 border-yellow-400 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center text-9xl shadow-2xl">
                     <div class="text-center">
                         <i class="fa-solid fa-gift text-white text-8xl mb-6"></i>
                         <div class="text-white text-4xl font-bold">CLICK TO OPEN</div>
@@ -121,6 +120,8 @@
         ];
 
         let collection = JSON.parse(localStorage.getItem('miyagiCollection')) || [];
+        let lastPackTime = parseInt(localStorage.getItem('lastPackTime')) || 0;
+        let isOnCooldown = false;
 
         function navigate(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
@@ -129,14 +130,27 @@
             if (page === 3) renderAllCards();
         }
 
-        function resetTimer() {
-            localStorage.setItem('lastPackTime', '0');
-            alert('Timer reset! Click OPEN PACK now.');
+        function updateTimer() {
+            const now = Date.now();
+            const remaining = 600000 - (now - lastPackTime);
+            if (remaining <= 0) {
+                document.getElementById('timerDisplay').innerHTML = `<i class="fa-solid fa-clock text-green-400"></i><span class="text-green-400">READY!</span>`;
+                return true;
+            }
+            const min = Math.floor(remaining / 60000);
+            const sec = Math.floor((remaining % 60000) / 1000);
+            document.getElementById('timeLeft').textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+            return false;
         }
 
         function openPack() {
-            const openedArea = document.getElementById('openedPack');
+            if (isOnCooldown || !updateTimer()) {
+                alert("⏳ Wait 10 minutes for the next DMT Express run!");
+                return;
+            }
+            isOnCooldown = true;
             const packArea = document.getElementById('packArea');
+            const openedArea = document.getElementById('openedPack');
             packArea.classList.add('hidden');
             openedArea.classList.remove('hidden');
             openedArea.innerHTML = '<div class="col-span-5 text-center py-12 text-4xl">UNPACKING FROM THE TUNNEL...</div>';
@@ -160,8 +174,14 @@
                     if (!collection.includes(card.id)) collection.push(card.id);
                 });
                 localStorage.setItem('miyagiCollection', JSON.stringify(collection));
-            }, 1200);
+                lastPackTime = Date.now();
+                localStorage.setItem('lastPackTime', lastPackTime);
+                isOnCooldown = false;
+                updateTimer();
+            }, 1500);
         }
+
+        function claimDailyPack() { openPack(); }
 
         function showCardModal(card) {
             document.getElementById('modalImage').src = card.image;
@@ -213,6 +233,8 @@
         }
 
         function init() {
+            updateTimer();
+            setInterval(updateTimer, 1000);
             navigate(0);
         }
 
