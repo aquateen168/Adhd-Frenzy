@@ -8,11 +8,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        body { background: linear-gradient(135deg, #0f172a 0%, #1e1133 100%); color: white; font-family: 'VT323', monospace; }
-        .card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card:hover { transform: scale(1.08) rotate(1deg); box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); }
-        .modal { animation: modalPop 0.3s ease-out; }
-        @keyframes modalPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1133 100%); 
+            color: white; 
+            font-family: 'VT323', monospace; 
+        }
+        .card { 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .card:hover { 
+            transform: scale(1.08) rotate(1deg); 
+            box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); 
+        }
+        .modal { 
+            animation: modalPop 0.3s ease-out; 
+        }
+        @keyframes modalPop { 
+            from { transform: scale(0.7); opacity: 0; } 
+            to { transform: scale(1); opacity: 1; } 
+        }
     </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -99,28 +113,28 @@
     </div>
 
     <script>
-        const USERNAME = "aquateen168";   // ← CHANGE THIS TO YOUR EXACT GITHUB USERNAME IF DIFFERENT
+        const USERNAME = "aquateen168";   // Your GitHub username
 
         const allCards = [
-            { id: "god-rare", name: "The Ultimate Trip", number: "Special / Ultra Rare - DMT Edition", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/God Rare.jpg` },
-            { id: "0-0-100", name: "The Meaning of You (Human)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/0.0.100.jpg` },
-            { id: "0-1-100", name: "The Meaning of You (Spiritual)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/0.1.100.jpg` },
-            { id: "0-2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/0.2.100.jpg` },
-            { id: "0-3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/0.3.100.jpg` },
-            { id: "0-4-100", name: "The Meaning of You (Festival)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/0.4.100.jpg` },
-            { id: "1-100", name: "The Meaning of Life is Beautiful", number: "22/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/1.100.jpg` },
-            { id: "2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/2.100.jpg` },
-            { id: "3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/3.100.jpg` },
-            { id: "4-100", name: "The Meaning of You", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/4.100.jpg` },
-            { id: "5-100", name: "The Meaning of Atlanta", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/5.jpg` },
-            { id: "5-skate", name: "Skate Zone - Morrow, GA", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/5.jpg` },
-            { id: "6-plaza", name: "The Plaza Theatre", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/6.jpg` },
-            { id: "7-varsity", name: "The Varsity - Atlanta", number: "7/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/7.jpg` },
-            { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/8.jpg` },
-            { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/9.jpg` },
-            { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/back.jpg` },
-            { id: "7-alt", name: "The Plaza Theatre (Alt)", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/7 Alt.jpg` },
-            { id: "god-rare-alt", name: "God Rare (Alt)", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/God Rare_alt.jpg` }
+            { id: "god-rare", name: "The Ultimate Trip", number: "Special / Ultra Rare - DMT Edition", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/God Rare.jpg` },
+            { id: "0-0-100", name: "The Meaning of You (Human)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.0.100.jpg` },
+            { id: "0-1-100", name: "The Meaning of You (Spiritual)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.1.100.jpg` },
+            { id: "0-2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.2.100.jpg` },
+            { id: "0-3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.3.100.jpg` },
+            { id: "0-4-100", name: "The Meaning of You (Festival)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.4.100.jpg` },
+            { id: "1-100", name: "The Meaning of Life is Beautiful", number: "22/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/1.100.jpg` },
+            { id: "2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/2.100.jpg` },
+            { id: "3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/3.100.jpg` },
+            { id: "4-100", name: "The Meaning of You", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/4.100.jpg` },
+            { id: "5-100", name: "The Meaning of Atlanta", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/5.jpg` },
+            { id: "5-skate", name: "Skate Zone - Morrow, GA", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/5.jpg` },
+            { id: "6-plaza", name: "The Plaza Theatre", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/6.jpg` },
+            { id: "7-varsity", name: "The Varsity - Atlanta", number: "7/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/7.jpg` },
+            { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/8.jpg` },
+            { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/9.jpg` },
+            { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/back.jpg` },
+            { id: "7-alt", name: "The Plaza Theatre (Alt)", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/7 Alt.jpg` },
+            { id: "god-rare-alt", name: "God Rare (Alt)", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/God Rare_alt.jpg` }
         ];
 
         let collection = JSON.parse(localStorage.getItem('miyagiCollection')) || [];
