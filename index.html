@@ -8,11 +8,74 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        body { background: linear-gradient(135deg, #0f172a 0%, #1e1133 100%); color: white; font-family: 'VT323', monospace; }
-        .card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .card:hover { transform: scale(1.08) rotate(1deg); box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); }
+        body { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e1133 100%); 
+            color: white; 
+            font-family: 'VT323', monospace; 
+        }
+        .card { 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .card:hover { 
+            transform: scale(1.08) rotate(1deg); 
+            box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); 
+        }
+        .god-rare:hover {
+            box-shadow: 0 0 60px rgba(255, 215, 0, 0.9);
+        }
         .modal { animation: modalPop 0.3s ease-out; }
-        @keyframes modalPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes modalPop { 
+            from { transform: scale(0.7); opacity: 0; } 
+            to { transform: scale(1); opacity: 1; } 
+        }
+        /* Pack opening animation */
+        .pack-burst {
+            animation: burst 0.6s ease-out forwards;
+        }
+        @keyframes burst {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.3) rotate(8deg); }
+            100% { transform: scale(0) rotate(-15deg); opacity: 0; }
+        }
+        /* Holo effect in modal */
+        .holo-card {
+            position: relative;
+            overflow: hidden;
+        }
+        .holo-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                120deg,
+                transparent 30%,
+                rgba(255,255,255,0.6) 50%,
+                transparent 70%
+            );
+            animation: holoShimmer 3s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes holoShimmer {
+            0% { transform: translateX(-100%) translateY(-100%); }
+            100% { transform: translateX(100%) translateY(100%); }
+        }
+        /* Card fly-in */
+        .reveal-card {
+            animation: flyIn 0.8s ease-out forwards;
+        }
+        @keyframes flyIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(100px) rotate(-15deg) scale(0.6); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) rotate(0deg) scale(1); 
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -35,6 +98,7 @@
                 <div id="timerDisplay" class="bg-black/80 px-4 py-2 rounded-2xl border-2 border-yellow-400 text-yellow-300 text-xl font-bold flex items-center gap-2">
                     <i class="fa-solid fa-clock"></i> <span id="timeLeft">10:00</span>
                 </div>
+                <div id="collectionCount" class="bg-black/80 px-4 py-2 rounded-2xl border-2 border-yellow-400 text-yellow-300 text-xl font-bold"></div>
                 <button onclick="claimDailyPack()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-3xl text-xl flex items-center gap-3">
                     <i class="fa-solid fa-bee"></i> OPEN PACK
                 </button>
@@ -54,7 +118,7 @@
 
         <!-- COLLECTION -->
         <div id="page-1" class="page hidden">
-            <h2 class="text-5xl mb-8">YOUR COLLECTION</h2>
+            <h2 class="text-5xl mb-8">YOUR COLLECTION <span id="progress" class="text-yellow-300"></span></h2>
             <div id="collectionGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6"></div>
         </div>
 
@@ -64,8 +128,8 @@
                 <h2 class="text-6xl mb-4">OPEN A PACK</h2>
                 <p class="text-3xl text-yellow-300 mb-12">5 cards • Every 10 minutes • No duplicates in one pack</p>
                 <div id="packArea" onclick="if(!isOnCooldown) openPack()" 
-                     class="cursor-pointer pack mx-auto w-96 h-96 border-8 border-yellow-400 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center text-9xl shadow-2xl">
-                    <div class="text-center">
+                     class="cursor-pointer pack mx-auto w-96 h-96 border-8 border-yellow-400 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center text-9xl shadow-2xl relative overflow-hidden">
+                    <div class="text-center z-10">
                         <i class="fa-solid fa-gift text-white text-8xl mb-6"></i>
                         <div class="text-white text-4xl font-bold">CLICK TO OPEN</div>
                     </div>
@@ -84,7 +148,7 @@
     <!-- CARD MODAL -->
     <div id="cardModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
         <div class="modal bg-black border-8 border-yellow-400 rounded-3xl max-w-md w-full overflow-hidden">
-            <div class="relative">
+            <div class="relative holo-card">
                 <img id="modalImage" class="w-full aspect-[5/7] object-cover" alt="Card">
                 <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/70 hover:bg-black text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl">✕</button>
             </div>
@@ -99,24 +163,25 @@
         const USERNAME = "aquateen168";
 
         const allCards = [
-            { id: "god-rare", name: "The Ultimate Trip", number: "Special / Ultra Rare - DMT Edition", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/God Rare.jpg` },
-            { id: "0-0-100", name: "The Meaning of You (Human)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.0.100.jpg` },
-            { id: "0-1-100", name: "The Meaning of You (Spiritual)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.1.100.jpg` },
-            { id: "0-2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.2.100.jpg` },
-            { id: "0-3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.3.100.jpg` },
-            { id: "0-4-100", name: "The Meaning of You (Festival)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.4.100.jpg` },
-            { id: "1-100", name: "The Meaning of Life is Beautiful", number: "22/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/1.100.jpg` },
-            { id: "2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/2.100.jpg` },
-            { id: "3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/3.100.jpg` },
-            { id: "4-100", name: "The Meaning of You", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/4.100.jpg` },
-            { id: "5-100", name: "The Meaning of Atlanta", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/5.jpg` },
-            { id: "5-skate", name: "Skate Zone - Morrow, GA", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/5.jpg` },
-            { id: "6-plaza", name: "The Plaza Theatre", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/6.jpg` },
-            { id: "7-varsity", name: "The Varsity - Atlanta", number: "7/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/7.jpg` },
-            { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/8.jpg` },
-            { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/9.jpg` },
-            { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/back.jpg` },
-            { id: "7-alt", name: "The Plaza Theatre (Alt)", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/7 Alt.jpg` }
+            { id: "god-rare", name: "The Ultimate Trip", number: "Special / Ultra Rare - DMT Edition", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/God%20Rare.jpg", rare: true },
+            { id: "0-0-100", name: "The Meaning of You (Human)", number: "4/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.0.100.jpg" },
+            { id: "0-1-100", name: "The Meaning of You (Spiritual)", number: "4/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.1.100.jpg" },
+            { id: "0-2-100", name: "The Meaning of Hope", number: "2/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.2.100.jpg" },
+            { id: "0-3-100", name: "The Meaning of Ascension", number: "3/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.3.100.jpg" },
+            { id: "0-4-100", name: "The Meaning of You (Festival)", number: "4/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.4.100.jpg" },
+            { id: "1-100", name: "The Meaning of Life is Beautiful", number: "22/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/1.100.jpg" },
+            { id: "2-100", name: "The Meaning of Hope", number: "2/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/2.100.jpg" },
+            { id: "3-100", name: "The Meaning of Ascension", number: "3/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/3.100.jpg" },
+            { id: "4-100", name: "The Meaning of You", number: "4/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/4.100.jpg" },
+            { id: "5-100", name: "The Meaning of Atlanta", number: "5/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/5.jpg" },
+            { id: "5-skate", name: "Skate Zone - Morrow, GA", number: "5/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/5.jpg" },
+            { id: "6-plaza", name: "The Plaza Theatre", number: "6/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/6.jpg" },
+            { id: "7-varsity", name: "The Varsity - Atlanta", number: "7/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/7.jpg" },
+            { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/8.jpg" },
+            { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/9.jpg" },
+            { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/back.jpg" },
+            { id: "7-alt", name: "The Plaza Theatre (Alt)", number: "6/100", image: "https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/7 Alt.jpg" },
+            // Add any more cards here as you create them
         ];
 
         let collection = JSON.parse(localStorage.getItem('miyagiCollection')) || [];
@@ -133,14 +198,23 @@
         function updateTimer() {
             const now = Date.now();
             const remaining = 600000 - (now - lastPackTime);
+            const timerEl = document.getElementById('timerDisplay');
             if (remaining <= 0) {
-                document.getElementById('timerDisplay').innerHTML = `<i class="fa-solid fa-clock text-green-400"></i><span class="text-green-400">READY!</span>`;
+                timerEl.innerHTML = `<i class="fa-solid fa-clock text-green-400"></i><span class="text-green-400">READY!</span>`;
                 return true;
             }
             const min = Math.floor(remaining / 60000);
             const sec = Math.floor((remaining % 60000) / 1000);
             document.getElementById('timeLeft').textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
             return false;
+        }
+
+        function updateCollectionCount() {
+            const countEl = document.getElementById('collectionCount');
+            const progressEl = document.getElementById('progress');
+            const percent = Math.round((collection.length / allCards.length) * 100);
+            countEl.textContent = `${collection.length}/${allCards.length}`;
+            if (progressEl) progressEl.textContent = `(${percent}%)`;
         }
 
         function openPack() {
@@ -151,34 +225,46 @@
             isOnCooldown = true;
             const packArea = document.getElementById('packArea');
             const openedArea = document.getElementById('openedPack');
-            packArea.classList.add('hidden');
-            openedArea.classList.remove('hidden');
-            openedArea.innerHTML = '<div class="col-span-5 text-center py-12 text-4xl">UNPACKING FROM THE TUNNEL...</div>';
-
+            
+            packArea.classList.add('pack-burst');
+            
             setTimeout(() => {
-                const shuffled = [...allCards].sort(() => 0.5 - Math.random());
-                const packCards = shuffled.slice(0, 5);
-                openedArea.innerHTML = '';
-                packCards.forEach(card => {
-                    const div = document.createElement('div');
-                    div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer`;
-                    div.innerHTML = `
-                        <img src="${card.image}" class="w-full aspect-[5/7] object-cover" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Image+Missing'">
-                        <div class="p-4 text-center">
-                            <div class="text-xl">${card.name}</div>
-                            <div class="text-yellow-300">${card.number}</div>
-                        </div>
-                    `;
-                    div.onclick = () => showCardModal(card);
-                    openedArea.appendChild(div);
-                    if (!collection.includes(card.id)) collection.push(card.id);
-                });
-                localStorage.setItem('miyagiCollection', JSON.stringify(collection));
-                lastPackTime = Date.now();
-                localStorage.setItem('lastPackTime', lastPackTime);
-                isOnCooldown = false;
-                updateTimer();
-            }, 1500);
+                packArea.classList.add('hidden');
+                openedArea.classList.remove('hidden');
+                openedArea.innerHTML = '<div class="col-span-5 text-center py-12 text-4xl animate-pulse">TUNNEL OPENING... DMT EXPRESS INCOMING 🐝</div>';
+
+                setTimeout(() => {
+                    const shuffled = [...allCards].sort(() => 0.5 - Math.random());
+                    const packCards = shuffled.slice(0, 5);
+                    openedArea.innerHTML = '';
+
+                    packCards.forEach((card, index) => {
+                        const div = document.createElement('div');
+                        div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer reveal-card ${card.rare ? 'god-rare' : ''}`;
+                        div.style.animationDelay = `${index * 150}ms`;
+                        div.innerHTML = `
+                            <img src="${card.image}" class="w-full aspect-[5/7] object-cover" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Image+Missing'">
+                            <div class="p-4 text-center">
+                                <div class="text-xl">${card.name}</div>
+                                <div class="text-yellow-300">${card.number}</div>
+                            </div>
+                        `;
+                        div.onclick = () => showCardModal(card);
+                        openedArea.appendChild(div);
+
+                        if (!collection.includes(card.id)) {
+                            collection.push(card.id);
+                        }
+                    });
+
+                    localStorage.setItem('miyagiCollection', JSON.stringify(collection));
+                    lastPackTime = Date.now();
+                    localStorage.setItem('lastPackTime', lastPackTime);
+                    isOnCooldown = false;
+                    updateTimer();
+                    updateCollectionCount();
+                }, 1200);
+            }, 600);
         }
 
         function claimDailyPack() { openPack(); }
@@ -201,7 +287,7 @@
                 const card = allCards.find(c => c.id === id);
                 if (!card) return;
                 const div = document.createElement('div');
-                div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer`;
+                div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer ${card.rare ? 'god-rare' : ''}`;
                 div.innerHTML = `
                     <img src="${card.image}" class="w-full aspect-[5/7] object-cover" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Image+Missing'">
                     <div class="p-4 text-center">
@@ -212,6 +298,7 @@
                 div.onclick = () => showCardModal(card);
                 grid.appendChild(div);
             });
+            updateCollectionCount();
         }
 
         function renderAllCards() {
@@ -219,7 +306,7 @@
             grid.innerHTML = '';
             allCards.forEach(card => {
                 const div = document.createElement('div');
-                div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer`;
+                div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer ${card.rare ? 'god-rare' : ''}`;
                 div.innerHTML = `
                     <img src="${card.image}" class="w-full aspect-[5/7] object-cover" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Image+Missing'">
                     <div class="p-4 text-center">
@@ -234,6 +321,7 @@
 
         function init() {
             updateTimer();
+            updateCollectionCount();
             setInterval(updateTimer, 1000);
             navigate(0);
         }
