@@ -35,21 +35,16 @@
         }
         @keyframes starTwinkle { 0% { background-position: 0 0; } 100% { background-position: 180px 180px; } }
 
-        /* ENHANCED HOLO FOR GOD RARE & SPECIAL */
-        .card.god-holo::after, .card.special-holo::after {
-            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(120deg, transparent 20%, rgba(255,215,0,0.9) 50%, transparent 80%);
-            animation: holoShimmer 2.5s linear infinite; pointer-events: none; opacity: 0.85;
-        }
-
-        /* FLIP + LANDSCAPE */
+        /* FLIP */
         .reveal-card { animation: flyIn 0.8s ease-out forwards; perspective: 1000px; }
         .reveal-card img { transition: transform 0.7s; transform-style: preserve-3d; }
         .reveal-card.flipped img { transform: rotateY(360deg); }
         @keyframes flyIn { from { opacity: 0; transform: translateY(100px) rotate(-15deg) scale(0.6); } to { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); } }
+
+        /* LANDSCAPE */
         .landscape { aspect-ratio: 7/5 !important; }
 
-        /* HEADER */
+        /* HEADER BOXES */
         .header-box { transition: all 0.2s; }
         .header-box:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(234, 179, 8, 0.3); }
     </style>
