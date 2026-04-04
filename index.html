@@ -8,18 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        body { 
-            background: linear-gradient(135deg, #0f172a 0%, #1e1133 100%); 
-            color: white; 
-            font-family: 'VT323', monospace; 
-        }
-        .card { 
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-        .card:hover { 
-            transform: scale(1.08) rotate(1deg); 
-            box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); 
-        }
+        body { background: linear-gradient(135deg, #0f172a 0%, #1e1133 100%); color: white; font-family: 'VT323', monospace; }
+        .card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card:hover { transform: scale(1.08) rotate(1deg); box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); }
+        .modal { animation: modalPop 0.3s ease-out; }
+        @keyframes modalPop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body class="min-h-screen pb-12">
@@ -39,10 +32,10 @@
                 <a onclick="navigate(3)" class="cursor-pointer hover:text-yellow-400">ALL CARDS</a>
             </nav>
             <div class="flex items-center gap-3">
-                <button onclick="resetTimer()" class="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2 rounded-xl text-sm">
-                    🔄 RESET TIMER
-                </button>
-                <button onclick="openPack()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-3xl text-xl flex items-center gap-3">
+                <div id="timerDisplay" class="bg-black/80 px-4 py-2 rounded-2xl border-2 border-yellow-400 text-yellow-300 text-xl font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-clock"></i> <span id="timeLeft">10:00</span>
+                </div>
+                <button onclick="claimDailyPack()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-6 py-3 rounded-3xl text-xl flex items-center gap-3">
                     <i class="fa-solid fa-bee"></i> OPEN PACK
                 </button>
             </div>
@@ -66,12 +59,12 @@
         </div>
 
         <!-- PACK OPENER -->
-        <div id="page-2" class="page">
+        <div id="page-2" class="page hidden">
             <div class="text-center py-12">
                 <h2 class="text-6xl mb-4">OPEN A PACK</h2>
-                <p class="text-3xl text-yellow-300 mb-12">5 cards • Click OPEN PACK to test</p>
-                <div onclick="openPack()" 
-                     class="cursor-pointer mx-auto w-96 h-96 border-8 border-yellow-400 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center text-9xl shadow-2xl">
+                <p class="text-3xl text-yellow-300 mb-12">5 cards • Every 10 minutes • No duplicates in one pack</p>
+                <div id="packArea" onclick="if(!isOnCooldown) openPack()" 
+                     class="cursor-pointer pack mx-auto w-96 h-96 border-8 border-yellow-400 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center text-9xl shadow-2xl">
                     <div class="text-center">
                         <i class="fa-solid fa-gift text-white text-8xl mb-6"></i>
                         <div class="text-white text-4xl font-bold">CLICK TO OPEN</div>
@@ -103,30 +96,33 @@
     </div>
 
     <script>
-        const USERNAME = "aquateen168";   // Your GitHub username
+        const USERNAME = "aquateen168";   // ← CHANGE THIS TO YOUR EXACT GITHUB USERNAME IF DIFFERENT
 
         const allCards = [
-            { id: "god-rare", name: "The Ultimate Trip", number: "Special / Ultra Rare - DMT Edition", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/God Rare.jpg` },
-            { id: "0-0-100", name: "The Meaning of You (Human)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.0.100.jpg` },
-            { id: "0-1-100", name: "The Meaning of You (Spiritual)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.1.100.jpg` },
-            { id: "0-2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.2.100.jpg` },
-            { id: "0-3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.3.100.jpg` },
-            { id: "0-4-100", name: "The Meaning of You (Festival)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.4.100.jpg` },
-            { id: "1-100", name: "The Meaning of Life is Beautiful", number: "22/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/1.100.jpg` },
-            { id: "2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/2.100.jpg` },
-            { id: "3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/3.100.jpg` },
-            { id: "4-100", name: "The Meaning of You", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/4.100.jpg` },
-            { id: "5-100", name: "The Meaning of Atlanta", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/5.jpg` },
-            { id: "5-skate", name: "Skate Zone - Morrow, GA", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/5.jpg` },
-            { id: "6-plaza", name: "The Plaza Theatre", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/6.jpg` },
-            { id: "7-varsity", name: "The Varsity - Atlanta", number: "7/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/7.jpg` },
-            { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/8.jpg` },
-            { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/9.jpg` },
-            { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/back.jpg` },
-            { id: "7-alt", name: "The Plaza Theatre (Alt)", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/7 Alt.jpg` }
+            { id: "god-rare", name: "The Ultimate Trip", number: "Special / Ultra Rare - DMT Edition", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/God Rare.jpg` },
+            { id: "0-0-100", name: "The Meaning of You (Human)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.0.100.jpg` },
+            { id: "0-1-100", name: "The Meaning of You (Spiritual)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.1.100.jpg` },
+            { id: "0-2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.2.100.jpg` },
+            { id: "0-3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.3.100.jpg` },
+            { id: "0-4-100", name: "The Meaning of You (Festival)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/0.4.100.jpg` },
+            { id: "1-100", name: "The Meaning of Life is Beautiful", number: "22/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/1.100.jpg` },
+            { id: "2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/2.100.jpg` },
+            { id: "3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/3.100.jpg` },
+            { id: "4-100", name: "The Meaning of You", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/4.100.jpg` },
+            { id: "5-100", name: "The Meaning of Atlanta", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/5.jpg` },
+            { id: "5-skate", name: "Skate Zone - Morrow, GA", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/5.jpg` },
+            { id: "6-plaza", name: "The Plaza Theatre", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/6.jpg` },
+            { id: "7-varsity", name: "The Varsity - Atlanta", number: "7/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/7.jpg` },
+            { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/8.jpg` },
+            { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/9.jpg` },
+            { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/back.jpg` },
+            { id: "7-alt", name: "The Plaza Theatre (Alt)", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/7 Alt.jpg` },
+            { id: "god-rare-alt", name: "God Rare (Alt)", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/tree-top-miyagi-tcg/cards/cards/God Rare_alt.jpg` }
         ];
 
         let collection = JSON.parse(localStorage.getItem('miyagiCollection')) || [];
+        let lastPackTime = parseInt(localStorage.getItem('lastPackTime')) || 0;
+        let isOnCooldown = false;
 
         function navigate(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
@@ -135,14 +131,27 @@
             if (page === 3) renderAllCards();
         }
 
-        function resetTimer() {
-            localStorage.setItem('lastPackTime', '0');
-            alert('Timer reset! Open a pack now.');
+        function updateTimer() {
+            const now = Date.now();
+            const remaining = 600000 - (now - lastPackTime);
+            if (remaining <= 0) {
+                document.getElementById('timerDisplay').innerHTML = `<i class="fa-solid fa-clock text-green-400"></i><span class="text-green-400">READY!</span>`;
+                return true;
+            }
+            const min = Math.floor(remaining / 60000);
+            const sec = Math.floor((remaining % 60000) / 1000);
+            document.getElementById('timeLeft').textContent = `${min}:${sec < 10 ? '0' : ''}${sec}`;
+            return false;
         }
 
         function openPack() {
-            const openedArea = document.getElementById('openedPack');
+            if (isOnCooldown || !updateTimer()) {
+                alert("⏳ Wait 10 minutes for the next DMT Express run!");
+                return;
+            }
+            isOnCooldown = true;
             const packArea = document.getElementById('packArea');
+            const openedArea = document.getElementById('openedPack');
             packArea.classList.add('hidden');
             openedArea.classList.remove('hidden');
             openedArea.innerHTML = '<div class="col-span-5 text-center py-12 text-4xl">UNPACKING FROM THE TUNNEL...</div>';
@@ -166,8 +175,14 @@
                     if (!collection.includes(card.id)) collection.push(card.id);
                 });
                 localStorage.setItem('miyagiCollection', JSON.stringify(collection));
-            }, 1200);
+                lastPackTime = Date.now();
+                localStorage.setItem('lastPackTime', lastPackTime);
+                isOnCooldown = false;
+                updateTimer();
+            }, 1500);
         }
+
+        function claimDailyPack() { openPack(); }
 
         function showCardModal(card) {
             document.getElementById('modalImage').src = card.image;
@@ -182,7 +197,7 @@
 
         function renderCollection() {
             const grid = document.getElementById('collectionGrid');
-            grid.innerHTML = '';
+            grid.innerHTML = collection.length ? '' : `<div class="col-span-full text-center py-20 text-4xl text-yellow-300">No cards yet… open packs!</div>`;
             collection.forEach(id => {
                 const card = allCards.find(c => c.id === id);
                 if (!card) return;
@@ -219,6 +234,8 @@
         }
 
         function init() {
+            updateTimer();
+            setInterval(updateTimer, 1000);
             navigate(0);
         }
 
