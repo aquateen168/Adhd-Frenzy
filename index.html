@@ -16,7 +16,7 @@
         .god-rare { border-color: #ffd700 !important; box-shadow: 0 0 30px #ffd700; }
         .special { border-color: #c026d3 !important; box-shadow: 0 0 25px #c026d3; }
         
-        /* CLASSIC HOLO (regular cards) */
+        /* CLASSIC HOLO */
         .card.holo::after {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.75) 50%, transparent 70%);
@@ -24,7 +24,7 @@
         }
         @keyframes holoShimmer { 0% { transform: translateX(-100%) translateY(-100%); } 100% { transform: translateX(100%) translateY(100%); } }
 
-        /* STAR HOLO (location cards) */
+        /* STAR HOLO FOR LOCATIONS */
         .card.star-holo::before {
             content: ''; position: absolute; inset: 0; 
             background: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 2px);
@@ -35,12 +35,11 @@
         }
         @keyframes starTwinkle { 0% { background-position: 0 0; } 100% { background-position: 200px 200px; } }
 
-        /* FLIP + LANDSCAPE */
+        /* FLIP */
         .reveal-card { animation: flyIn 0.8s ease-out forwards; perspective: 1000px; }
         .reveal-card img { transition: transform 0.7s; transform-style: preserve-3d; }
         .reveal-card.flipped img { transform: rotateY(360deg); }
         @keyframes flyIn { from { opacity: 0; transform: translateY(100px) rotate(-15deg) scale(0.6); } to { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); } }
-        .landscape { aspect-ratio: 7/5 !important; }
 
         /* HEADER BOXES */
         .header-box { transition: all 0.2s; }
@@ -133,11 +132,11 @@
         </div>
     </div>
 
-    <!-- CARD MODAL -->
+    <!-- CARD MODAL - DYNAMIC ASPECT -->
     <div id="cardModal" class="hidden fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-        <div class="bg-black border-8 border-yellow-400 rounded-3xl max-w-md w-full overflow-hidden">
+        <div class="bg-black border-8 border-yellow-400 rounded-3xl max-w-4xl w-full overflow-hidden">
             <div class="relative">
-                <img id="modalImage" class="w-full aspect-[5/7] object-cover" alt="Card">
+                <img id="modalImage" class="w-full object-contain max-h-[80vh]" alt="Card">
                 <button onclick="closeModal()" class="absolute top-4 right-4 bg-black/70 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl">✕</button>
             </div>
             <div class="p-6 text-center">
@@ -187,7 +186,6 @@
         function updateTimer() {
             const now = Date.now();
             const remaining = 600000 - (now - lastPackTime);
-            const readyBox = document.getElementById('readyBox');
             if (remaining <= 0) {
                 document.getElementById('readyText').textContent = "READY!";
                 return true;
@@ -305,7 +303,16 @@
         function claimDailyPack() { openPack(); }
 
         function showCardModal(card) {
-            document.getElementById('modalImage').src = card.image;
+            const modalImg = document.getElementById('modalImage');
+            modalImg.src = card.image;
+            // Dynamic aspect for modal
+            if (card.landscape) {
+                modalImg.style.aspectRatio = '7/5';
+                modalImg.style.maxHeight = '70vh';
+            } else {
+                modalImg.style.aspectRatio = '5/7';
+                modalImg.style.maxHeight = '80vh';
+            }
             document.getElementById('modalName').textContent = card.name;
             document.getElementById('modalNumber').textContent = card.number;
             document.getElementById('cardModal').classList.remove('hidden');
