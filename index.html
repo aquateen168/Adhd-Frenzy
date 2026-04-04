@@ -16,9 +16,24 @@
         .god-rare { border-color: #ffd700 !important; box-shadow: 0 0 30px #ffd700; }
         .special { border-color: #c026d3 !important; box-shadow: 0 0 25px #c026d3; }
         
-        /* HOLO */
-        .card.holo::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.75) 50%, transparent 70%); animation: holoShimmer 4s linear infinite; pointer-events: none; opacity: 0.65; }
+        /* CLASSIC HOLO (regular cards) */
+        .card.holo::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.75) 50%, transparent 70%);
+            animation: holoShimmer 4s linear infinite; pointer-events: none; opacity: 0.65;
+        }
         @keyframes holoShimmer { 0% { transform: translateX(-100%) translateY(-100%); } 100% { transform: translateX(100%) translateY(100%); } }
+
+        /* STAR HOLO (location cards) */
+        .card.star-holo::before {
+            content: ''; position: absolute; inset: 0; 
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 2px);
+            background-size: 40px 40px;
+            animation: starTwinkle 6s linear infinite;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        @keyframes starTwinkle { 0% { background-position: 0 0; } 100% { background-position: 200px 200px; } }
 
         /* FLIP + LANDSCAPE */
         .reveal-card { animation: flyIn 0.8s ease-out forwards; perspective: 1000px; }
@@ -34,10 +49,9 @@
 </head>
 <body class="min-h-screen pb-12">
 
-    <!-- PREMIUM HEADER (matches your screenshot) -->
+    <!-- PREMIUM HEADER -->
     <header class="bg-black border-b-4 border-yellow-400 py-4 sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-6 flex items-center justify-between">
-            <!-- Logo -->
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center text-4xl shadow-inner">🐝</div>
                 <div>
@@ -45,16 +59,12 @@
                     <p class="text-xs text-yellow-400 tracking-[4px]">SERIES 1 • 100 CARDS</p>
                 </div>
             </div>
-
-            <!-- Nav -->
             <nav class="flex gap-8 text-xl text-white">
                 <a onclick="navigate(0)" class="cursor-pointer hover:text-yellow-400">HOME</a>
                 <a onclick="navigate(1)" class="cursor-pointer hover:text-yellow-400">COLLECTION</a>
                 <a onclick="navigate(2)" class="cursor-pointer hover:text-yellow-400">OPEN PACK</a>
                 <a onclick="navigate(3)" class="cursor-pointer hover:text-yellow-400">ALL CARDS</a>
             </nav>
-
-            <!-- Floating Boxes -->
             <div class="flex items-center gap-3">
                 <div id="readyBox" onclick="if(!isOnCooldown) openPack()" class="header-box cursor-pointer bg-green-500 text-black font-bold px-6 py-2 rounded-3xl flex items-center gap-2 border-2 border-green-400">
                     <i class="fa-solid fa-clock"></i> <span id="readyText" class="text-xl">READY!</span>
@@ -96,8 +106,9 @@
             <div class="text-center py-12">
                 <h2 class="text-6xl mb-4">OPEN A PACK</h2>
                 <p class="text-3xl text-yellow-300 mb-12">5 cards • Every 10 minutes</p>
-                <div id="packArea" onclick="if(!isOnCooldown) openPack()" class="cursor-pointer mx-auto w-96 h-96 border-8 border-yellow-400 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center text-9xl shadow-2xl">
-                    <div class="text-center"><i class="fa-solid fa-gift text-white text-8xl mb-6"></i><div class="text-4xl font-bold">CLICK TO OPEN</div></div>
+                <div id="packArea" onclick="if(!isOnCooldown) openPack()" 
+                     class="cursor-pointer mx-auto w-96 h-96 border-8 border-yellow-400 bg-gradient-to-br from-purple-600 to-pink-600 rounded-3xl flex items-center justify-center text-9xl shadow-2xl relative overflow-hidden">
+                    <div class="text-center z-10"><i class="fa-solid fa-gift text-white text-8xl mb-6"></i><div class="text-4xl font-bold">CLICK TO OPEN</div></div>
                 </div>
                 <div id="openedPack" class="hidden mt-12 grid grid-cols-5 gap-6"></div>
             </div>
@@ -152,7 +163,6 @@
             { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/8.jpg`, landscape: true, code: "TTM-VAR002" },
             { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/9.jpg`, landscape: true, code: "TTM-EAST001" },
             { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/back.jpg`, rare: "special", code: "TTM-ADHD001" }
-            // Add more cards here as you create them with unique codes
         ];
 
         let collection = JSON.parse(localStorage.getItem('miyagiCollection')) || [];
@@ -180,7 +190,6 @@
             const readyBox = document.getElementById('readyBox');
             if (remaining <= 0) {
                 document.getElementById('readyText').textContent = "READY!";
-                readyBox.classList.add('bg-green-500', 'border-green-400');
                 return true;
             }
             const min = Math.floor(remaining / 60000);
@@ -261,8 +270,9 @@
                     packCards.forEach((card, i) => {
                         const div = document.createElement('div');
                         const rarity = card.rare === "god" ? 'god-rare' : (card.rare === "special" ? 'special' : '');
+                        const holoType = card.landscape ? 'star-holo' : 'holo';
                         const aspect = card.landscape ? 'landscape' : 'aspect-[5/7]';
-                        div.className = `card holo bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer reveal-card ${rarity}`;
+                        div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer reveal-card ${rarity} ${holoType}`;
                         div.style.animationDelay = `${i * 150}ms`;
                         div.dataset.id = card.id;
                         div.innerHTML = `
@@ -313,8 +323,9 @@
                 if (!card) return;
                 const div = document.createElement('div');
                 const rarity = card.rare === "god" ? 'god-rare' : (card.rare === "special" ? 'special' : '');
+                const holoType = card.landscape ? 'star-holo' : 'holo';
                 const aspect = card.landscape ? 'landscape' : 'aspect-[5/7]';
-                div.className = `card holo bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer ${rarity}`;
+                div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer ${rarity} ${holoType}`;
                 div.dataset.id = card.id;
                 div.innerHTML = `
                     <img src="${card.image}" class="w-full ${aspect} object-cover" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Missing'">
@@ -337,8 +348,9 @@
             allCards.forEach(card => {
                 const div = document.createElement('div');
                 const rarity = card.rare === "god" ? 'god-rare' : (card.rare === "special" ? 'special' : '');
+                const holoType = card.landscape ? 'star-holo' : 'holo';
                 const aspect = card.landscape ? 'landscape' : 'aspect-[5/7]';
-                div.className = `card holo bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer ${rarity}`;
+                div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer ${rarity} ${holoType}`;
                 div.innerHTML = `
                     <img src="${card.image}" class="w-full ${aspect} object-cover" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Missing'">
                     <div class="p-4 text-center">
