@@ -212,10 +212,13 @@
         </div>
     </div>
 
-    <!-- HELP / PASSWORD PROTECTED RESET -->
+    <!-- HELP / PASSWORD PROTECTED RESET WITH CLOSE BUTTON -->
     <div class="fixed bottom-4 left-1/2 -translate-x-1/2 text-center">
         <a onclick="showHelpPrompt()" class="text-yellow-400 hover:text-yellow-300 text-xl cursor-pointer underline">Help</a>
         <div id="helpPanel" class="hidden mt-3 bg-black/90 border border-yellow-400 rounded-2xl p-6 flex flex-col gap-4 items-center max-w-xs mx-auto">
+            <div class="flex justify-end w-full">
+                <button onclick="closeHelpPanel()" class="text-yellow-400 hover:text-white text-2xl leading-none">✕</button>
+            </div>
             <p class="text-yellow-300">Enter password to unlock reset tools:</p>
             <input id="helpPassword" type="password" placeholder="Password" 
                    class="bg-zinc-900 border border-yellow-400 text-white px-4 py-2 rounded-xl w-full text-center">
@@ -267,6 +270,12 @@
             }
         }
 
+        function closeHelpPanel() {
+            document.getElementById('helpPanel').classList.add('hidden');
+            document.getElementById('resetSection').classList.add('hidden');
+            document.getElementById('helpPassword').value = '';
+        }
+
         function resetEverything() {
             if (confirm("Reset entire collection and timer? This cannot be undone.")) {
                 collection = [];
@@ -276,7 +285,7 @@
                 updateCollectionCount();
                 updateTimer();
                 alert("Collection and timer fully reset!");
-                document.getElementById('helpPanel').classList.add('hidden');
+                closeHelpPanel();
             }
         }
 
