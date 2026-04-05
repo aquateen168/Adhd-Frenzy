@@ -35,7 +35,8 @@
         .card:hover { transform: scale(1.08) rotate(1deg); box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); }
         .god-rare { border-color: #ffd700 !important; box-shadow: 0 0 40px #ffd700; }
         .special { border-color: #c026d3 !important; box-shadow: 0 0 30px #c026d3; }
-        .card.holo::after { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        .card.holo::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.8) 50%, transparent 70%);
             animation: holoShimmer 3.5s linear infinite; pointer-events: none; opacity: 0.75;
         }
@@ -143,9 +144,19 @@
     <!-- TRADE -->
     <div id="page-5" class="page hidden">
         <h2 class="text-5xl mb-8">TRADE WITH THE HIVE</h2>
+        <div class="flex gap-4 mb-6">
+            <button onclick="startTrade()" class="bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-3 rounded-3xl">Create Trade Link</button>
+            <button onclick="joinTrade()" class="bg-purple-500 hover:bg-purple-400 text-white font-bold px-8 py-3 rounded-3xl">Join Trade</button>
+        </div>
         <div class="grid grid-cols-2 gap-8">
-            <div><h3 class="text-3xl mb-4">Your Offer</h3><div id="tradeOffer" class="min-h-[300px] border-4 border-dashed border-yellow-400 rounded-3xl p-6"></div></div>
-            <div><h3 class="text-3xl mb-4">Receive</h3><div id="tradeReceive" class="min-h-[300px] border-4 border-dashed border-purple-400 rounded-3xl p-6"></div></div>
+            <div>
+                <h3 class="text-3xl mb-4">Your Offer</h3>
+                <div id="tradeOffer" class="min-h-[300px] border-4 border-dashed border-yellow-400 rounded-3xl p-6"></div>
+            </div>
+            <div>
+                <h3 class="text-3xl mb-4">Their Offer</h3>
+                <div id="tradeReceive" class="min-h-[300px] border-4 border-dashed border-purple-400 rounded-3xl p-6"></div>
+            </div>
         </div>
         <div class="text-center mt-8">
             <button onclick="confirmTrade()" class="bg-gradient-to-r from-yellow-400 to-pink-500 text-black text-3xl px-16 py-6 rounded-3xl font-bold">COMPLETE TRADE 🐝</button>
@@ -190,6 +201,11 @@
     let lastPackTime = parseInt(localStorage.getItem('lastPackTime')) || 0;
     let isOnCooldown = false;
 
+    let peerConnection = null;
+    let dataChannel = null;
+    let myOffer = [];
+    let theirOffer = [];
+
     function navigate(page) {
         document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
         document.getElementById(`page-${page}`).classList.remove('hidden');
@@ -228,7 +244,8 @@
         openedArea.classList.remove('hidden');
         openedArea.innerHTML = '';
 
-        const card = allCards[Math.floor(Math.random() * allCards.length)];
+        const shuffled = [...allCards].sort(() => 0.5 - Math.random());
+        const card = shuffled[0];
 
         const div = document.createElement('div');
         const rarity = card.rare === "god" ? 'god-rare god-holo' : (card.rare === "special" ? 'special special-holo' : '');
@@ -236,11 +253,13 @@
         const aspect = card.landscape ? 'landscape' : 'aspect-[5/7]';
 
         div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer reveal-card ${rarity} ${holoType} w-full max-w-lg`;
+        div.dataset.id = card.id;
         div.innerHTML = `
             <img src="${card.image}" class="w-full ${aspect} object-cover" onerror="this.src='https://placehold.co/600x400/4f46e5/fff?text=Missing'">
             <div class="p-6 text-center">
                 <div class="text-3xl">${card.name}</div>
                 <div class="text-yellow-300 text-2xl">${card.number}</div>
+                <div class="text-xs text-purple-300 mt-2">CODE: ${card.code || 'N/A'}</div>
             </div>
         `;
         div.onclick = () => showCardModal(card);
@@ -278,10 +297,13 @@
         collection.forEach(id => {
             const card = allCards.find(c => c.id === id);
             if (!card) return;
+            const rarity = card.rare === "god" ? 'god-rare god-holo' : (card.rare === "special" ? 'special special-holo' : '');
+            const holoType = card.landscape ? 'star-holo' : 'holo';
             const div = document.createElement('div');
-            div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer`;
+            div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer ${rarity} ${holoType}`;
+            div.dataset.id = card.id;
             div.innerHTML = `
-                <div class="card-thumb ${card.landscape ? 'aspect-[7/5]' : 'aspect-[5/7]'}">
+                <div class="card-thumb aspect-[5/7] ${card.landscape ? 'aspect-[7/5]' : ''}">
                     <img src="${card.image}" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Missing'">
                 </div>
                 <div class="p-4 text-center">
@@ -299,10 +321,12 @@
         const grid = document.getElementById('allCardsGrid');
         grid.innerHTML = '';
         allCards.forEach(card => {
+            const rarity = card.rare === "god" ? 'god-rare god-holo' : (card.rare === "special" ? 'special special-holo' : '');
+            const holoType = card.landscape ? 'star-holo' : 'holo';
             const div = document.createElement('div');
-            div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer`;
+            div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer ${rarity} ${holoType}`;
             div.innerHTML = `
-                <div class="card-thumb ${card.landscape ? 'aspect-[7/5]' : 'aspect-[5/7]'}">
+                <div class="card-thumb aspect-[5/7] ${card.landscape ? 'aspect-[7/5]' : ''}">
                     <img src="${card.image}" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Missing'">
                 </div>
                 <div class="p-4 text-center">
@@ -315,24 +339,90 @@
         });
     }
 
-    // NEW MECHANICS
+    // Daily Quests (simple)
     function generateDailyQuests() {
-        document.getElementById('questsGrid').innerHTML = `
+        const grid = document.getElementById('questsGrid');
+        grid.innerHTML = `
             <div class="bg-black/80 border-4 border-yellow-400 rounded-3xl p-6">Open 3 packs today</div>
             <div class="bg-black/80 border-4 border-yellow-400 rounded-3xl p-6">View your full collection</div>
         `;
         document.getElementById('questStreak').textContent = "3 DAY STREAK 🔥";
     }
 
+    // Trade Linking System
+    function startTrade() {
+        navigate(5);
+        myOffer = [];
+        theirOffer = [];
+        renderMyOffer();
+        renderTheirOffer();
+        alert("Trade link created! Share this session with another tab/window.\n\nIn the second tab, click 'Join Trade' to connect.");
+    }
+
+    function joinTrade() {
+        navigate(5);
+        myOffer = [];
+        theirOffer = [];
+        renderMyOffer();
+        renderTheirOffer();
+        alert("Joined trade session! Drag cards from your Collection to the Your Offer area.");
+    }
+
     function renderTrade() {
-        document.getElementById('tradeOffer').innerHTML = '<p class="text-yellow-300">Drag cards from your Collection here to trade</p>';
+        renderMyOffer();
+        renderTheirOffer();
+    }
+
+    function renderMyOffer() {
+        const area = document.getElementById('tradeOffer');
+        area.innerHTML = myOffer.length ? myOffer.map(id => {
+            const card = allCards.find(c => c.id === id);
+            return `<div class="inline-block bg-black/70 p-3 m-2 rounded text-sm">${card ? card.name : id}</div>`;
+        }).join('') : '<p class="text-yellow-300">Drag cards from Collection here</p>';
+    }
+
+    function renderTheirOffer() {
+        const area = document.getElementById('tradeReceive');
+        area.innerHTML = theirOffer.length ? theirOffer.map(id => {
+            const card = allCards.find(c => c.id === id);
+            return `<div class="inline-block bg-purple-700 p-3 m-2 rounded text-sm">${card ? card.name : id}</div>`;
+        }).join('') : '<p class="text-yellow-300">Waiting for partner offer...</p>';
     }
 
     function confirmTrade() {
-        alert("🐝 Trade simulated successfully! You received a new card.");
+        if (myOffer.length === 0) {
+            alert("Offer at least one card!");
+            return;
+        }
+        // Simulate swap for demo (in real P2P both sides would receive the data)
+        alert(`🐝 Trade confirmed!\nYou gave: ${myOffer.length} cards\nYou received: ${theirOffer.length || myOffer.length} cards`);
+        
+        // Apply swap locally
+        collection = collection.filter(id => !myOffer.includes(id));
+        if (theirOffer.length > 0) collection = collection.concat(theirOffer);
+        else collection = collection.concat(myOffer); // demo loopback
+        
+        localStorage.setItem('miyagiCollection', JSON.stringify(collection));
+        renderCollection();
+        
+        myOffer = [];
+        theirOffer = [];
+        renderMyOffer();
+        renderTheirOffer();
     }
 
-    function showRedeemModal() { /* your original redeem */ alert("Redeem modal ready – enter code like TTM-GODRARE"); }
+    function showRedeemModal() {
+        const code = prompt("Enter redeem code (e.g. TTM-GODRARE):");
+        if (!code) return;
+        const card = allCards.find(c => c.code === code.toUpperCase());
+        if (card && !collection.includes(card.id)) {
+            collection.push(card.id);
+            localStorage.setItem('miyagiCollection', JSON.stringify(collection));
+            updateCollectionCount();
+            alert(`✅ Unlocked: ${card.name}`);
+            showCardModal(card);
+        } else alert("Invalid code or already owned!");
+    }
 
     function init() {
         updateTimer();
