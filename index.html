@@ -72,6 +72,16 @@
             to { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); } 
         }
 
+        /* PACK BURST ANIMATION - FIXED */
+        .pack-burst {
+            animation: packBurst 0.4s ease-out forwards;
+        }
+        @keyframes packBurst {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(0.95); }
+        }
+
         .header-box { transition: all 0.2s; }
         .header-box:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(234, 179, 8, 0.3); }
 
@@ -109,7 +119,7 @@
 </head>
 <body class="min-h-screen pb-20">
 
-    <!-- HEADER -->
+    <!-- HEADER (compact for mobile) -->
     <header class="bg-black/90 border-b-4 border-yellow-400 py-3 sticky top-0 z-50 backdrop-blur-md">
         <div class="max-w-6xl mx-auto px-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -140,9 +150,6 @@
                 <div id="collectionCountBox" class="header-box bg-transparent border-2 border-yellow-400 text-yellow-300 font-bold px-5 py-2 rounded-3xl text-xl">
                     <span id="collectionCount">0/18</span>
                 </div>
-                <button onclick="showRedeemModal()" class="header-box bg-transparent border-2 border-purple-400 text-purple-300 font-bold px-5 py-2 rounded-3xl text-sm flex items-center gap-2 hidden sm:flex">
-                    <i class="fa-solid fa-ticket"></i> REDEEM
-                </button>
                 <button onclick="claimDailyPack()" class="header-box bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-3 rounded-3xl text-xl flex items-center gap-3 active:scale-95">
                     <i class="fa-solid fa-bee"></i> OPEN PACK
                 </button>
@@ -166,10 +173,7 @@
             <div class="text-center py-12 md:py-20">
                 <h1 class="text-6xl md:text-8xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-pink-300 to-cyan-300">THE ULTIMATE TRIP</h1>
                 <p class="text-3xl md:text-4xl text-yellow-200 mt-4">Series 1 • 100 Cards</p>
-                
-                <!-- FIXED START BUTTON -->
-                <button onclick="navigate(2)" 
-                        class="mt-12 bg-gradient-to-r from-yellow-400 to-pink-500 text-black text-3xl px-16 py-8 rounded-3xl font-bold active:scale-95 transition-transform shadow-2xl">
+                <button onclick="navigate(2)" class="mt-12 bg-gradient-to-r from-yellow-400 to-pink-500 text-black text-3xl px-16 py-8 rounded-3xl font-bold active:scale-95 transition-transform shadow-2xl">
                     START YOUR JOURNEY
                 </button>
 
@@ -189,7 +193,7 @@
             <div id="collectionGrid" class="card-grid grid gap-6"></div>
         </div>
 
-        <!-- PACK OPENER -->
+        <!-- PACK OPENER - FIXED -->
         <div id="page-2" class="page hidden">
             <div class="text-center py-12">
                 <h2 class="text-6xl mb-4">OPEN A PACK</h2>
@@ -209,10 +213,10 @@
         </div>
     </div>
 
-    <!-- Your modals (redeem, card, help) - paste them exactly as in your original file here -->
+    <!-- Paste your original REDEEM MODAL, CARD MODAL, and HELP panel here (unchanged) -->
 
     <script>
-        // Mobile helpers
+        // Mobile menu
         function toggleMobileMenu() {
             document.getElementById('mobileMenu').classList.toggle('hidden');
         }
@@ -221,25 +225,79 @@
             toggleMobileMenu();
         }
 
-        // === YOUR ORIGINAL SCRIPT (unchanged except for navigate) ===
+        // YOUR FULL ORIGINAL SCRIPT
         const USERNAME = "aquateen168";
-        const allCards = [ /* paste your full allCards array here */ ];
+        const allCards = [ /* your full allCards array from the file */ ];
         let collection = JSON.parse(localStorage.getItem('miyagiCollection')) || [];
         let lastPackTime = parseInt(localStorage.getItem('lastPackTime')) || 0;
         let isOnCooldown = false;
         let draggedCard = null;
 
-        // ... paste all your other functions (showHelpPrompt, resetEverything, updateTimer, etc.) ...
+        // ... paste ALL your other functions exactly as they were (showHelpPrompt, resetEverything, navigate, updateTimer, etc.) ...
 
         function navigate(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-            const targetPage = document.getElementById(`page-${page}`);
-            if (targetPage) targetPage.classList.remove('hidden');
+            document.getElementById(`page-${page}`).classList.remove('hidden');
             if (page === 1) renderCollection();
             if (page === 3) renderAllCards();
         }
 
-        // ... rest of your script (openPack, renderCollection, etc.) ...
+        function openPack() {
+            if (isOnCooldown || !updateTimer()) {
+                alert("Wait 10 minutes for next pack!");
+                return;
+            }
+            isOnCooldown = true;
+            const packArea = document.getElementById('packArea');
+            const openedArea = document.getElementById('openedPack');
+
+            // Trigger burst animation
+            packArea.classList.add('pack-burst');
+
+            setTimeout(() => {
+                packArea.classList.add('hidden');
+                openedArea.classList.remove('hidden');
+                openedArea.innerHTML = '';
+
+                const shuffled = [...allCards].sort(() => 0.5 - Math.random());
+                const card = shuffled[0];
+
+                const div = document.createElement('div');
+                const rarity = card.rare === "god" ? 'god-rare god-holo' : (card.rare === "special" ? 'special special-holo' : '');
+                const holoType = card.landscape ? 'star-holo' : 'holo';
+                const aspect = card.landscape ? 'landscape' : 'aspect-[5/7]';
+
+                div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer reveal-card ${rarity} ${holoType} w-full max-w-lg`;
+                div.dataset.id = card.id;
+                div.innerHTML = `
+                    <img src="${card.image}" class="w-full ${aspect} object-cover" onerror="this.src='https://placehold.co/600x400/4f46e5/fff?text=Missing'">
+                    <div class="p-6 text-center">
+                        <div class="text-3xl">${card.name}</div>
+                        <div class="text-yellow-300 text-2xl">${card.number}</div>
+                        <div class="text-xs text-purple-300 mt-2">CODE: ${card.code}</div>
+                    </div>
+                `;
+                div.onclick = () => showCardModal(card);
+                makeDraggable(div, true);
+                openedArea.appendChild(div);
+
+                setTimeout(() => {
+                    div.classList.add('flipped');
+                    setTimeout(() => div.classList.add('settled'), 1100);
+                }, 150);
+
+                if (!collection.includes(card.id)) collection.push(card.id);
+                localStorage.setItem('miyagiCollection', JSON.stringify(collection));
+
+                isOnCooldown = false;
+                lastPackTime = Date.now();
+                localStorage.setItem('lastPackTime', lastPackTime);
+                updateTimer();
+                updateCollectionCount();
+            }, 400);
+        }
+
+        // ... rest of your original functions (claimDailyPack, showCardModal, renderCollection, etc.) ...
 
         function init() {
             updateTimer();
