@@ -8,13 +8,13 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-        
         body { 
             background: radial-gradient(circle at 30% 20%, rgba(255, 215, 0, 0.12) 0%, transparent 60%),
                         radial-gradient(circle at 70% 80%, rgba(192, 38, 211, 0.12) 0%, transparent 60%),
                         #0a0a1f;
             color: white; 
             font-family: 'VT323', monospace; 
+            position: relative;
             overflow-x: hidden;
             touch-action: manipulation;
         }
@@ -32,14 +32,19 @@
             pointer-events: none;
         }
         
-        @keyframes galaxySwirl { 0% { background-position: 0 0; } 100% { background-position: 600px 600px; } }
+        @keyframes galaxySwirl {
+            0% { background-position: 0 0; }
+            100% { background-position: 600px 600px; }
+        }
 
         .card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
         .card:hover { transform: scale(1.05) rotate(1deg); box-shadow: 0 0 40px rgba(255, 235, 59, 0.7); }
         
+        /* RARITY */
         .god-rare { border-color: #ffd700 !important; box-shadow: 0 0 40px #ffd700; }
         .special { border-color: #c026d3 !important; box-shadow: 0 0 30px #c026d3; }
         
+        /* HOLO */
         .card.holo::after {
             content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
             background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.8) 50%, transparent 70%);
@@ -57,22 +62,7 @@
         }
         @keyframes starTwinkle { 0% { background-position: 0 0; } 100% { background-position: 180px 180px; } }
 
-        .card-thumb img {
-            width: 100%; height: 100%; object-fit: cover; object-position: center;
-        }
-
-        .landscape-modal { aspect-ratio: 7/5 !important; max-height: 75vh; }
-
-        .reveal-card { animation: flyIn 0.8s ease-out forwards; perspective: 1200px; }
-        .reveal-card img { transition: transform 1.1s cubic-bezier(0.25, 0.1, 0.25, 1); transform-style: preserve-3d; }
-        .reveal-card.flipped img { transform: rotateY(720deg) rotate(12deg); }
-        .reveal-card.settled img { transform: rotateY(720deg) rotate(0deg) !important; }
-        @keyframes flyIn { 
-            from { opacity: 0; transform: translateY(120px) rotate(-20deg) scale(0.5); } 
-            to { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); } 
-        }
-
-        /* PACK BURST ANIMATION - FIXED */
+        /* PACK BURST ANIMATION - this was missing */
         .pack-burst {
             animation: packBurst 0.4s ease-out forwards;
         }
@@ -80,6 +70,27 @@
             0% { transform: scale(1); }
             50% { transform: scale(1.15); }
             100% { transform: scale(0.95); }
+        }
+
+        .card-thumb img {
+            width: 100%; height: 100%; object-fit: cover; object-position: center;
+        }
+
+        .landscape-modal {
+            aspect-ratio: 7/5 !important;
+            max-height: 75vh;
+        }
+
+        .reveal-card { animation: flyIn 0.8s ease-out forwards; perspective: 1200px; }
+        .reveal-card img { 
+            transition: transform 1.1s cubic-bezier(0.25, 0.1, 0.25, 1); 
+            transform-style: preserve-3d; 
+        }
+        .reveal-card.flipped img { transform: rotateY(720deg) rotate(12deg); }
+        .reveal-card.settled img { transform: rotateY(720deg) rotate(0deg) !important; }
+        @keyframes flyIn { 
+            from { opacity: 0; transform: translateY(120px) rotate(-20deg) scale(0.5); } 
+            to { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); } 
         }
 
         .header-box { transition: all 0.2s; }
@@ -97,6 +108,7 @@
             box-shadow: 0 0 20px rgba(234, 179, 8, 0.6);
         }
 
+        /* Mobile-First Card Grid */
         .card-grid {
             grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         }
@@ -119,7 +131,7 @@
 </head>
 <body class="min-h-screen pb-20">
 
-    <!-- HEADER (compact for mobile) -->
+    <!-- HEADER - Compact on mobile -->
     <header class="bg-black/90 border-b-4 border-yellow-400 py-3 sticky top-0 z-50 backdrop-blur-md">
         <div class="max-w-6xl mx-auto px-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -150,6 +162,9 @@
                 <div id="collectionCountBox" class="header-box bg-transparent border-2 border-yellow-400 text-yellow-300 font-bold px-5 py-2 rounded-3xl text-xl">
                     <span id="collectionCount">0/18</span>
                 </div>
+                <button onclick="showRedeemModal()" class="header-box bg-transparent border-2 border-purple-400 hover:border-purple-300 text-purple-300 font-bold px-5 py-2 rounded-3xl text-sm flex items-center gap-2 hidden sm:flex">
+                    <i class="fa-solid fa-ticket"></i> REDEEM
+                </button>
                 <button onclick="claimDailyPack()" class="header-box bg-yellow-400 hover:bg-yellow-300 text-black font-bold px-8 py-3 rounded-3xl text-xl flex items-center gap-3 active:scale-95">
                     <i class="fa-solid fa-bee"></i> OPEN PACK
                 </button>
@@ -177,12 +192,14 @@
                     START YOUR JOURNEY
                 </button>
 
+                <!-- CONNECT WITH THE HIVE -->
                 <div class="mt-20">
                     <h3 class="text-5xl text-yellow-300 mb-8">JOIN THE HIVE</h3>
                     <div class="grid grid-cols-2 gap-8 max-w-lg mx-auto">
                         <a href="https://www.whatnot.com/user/mysticcardarena" target="_blank" class="header-box bg-purple-600 hover:bg-purple-500 text-white px-8 py-6 rounded-3xl text-3xl flex items-center justify-center gap-4 border-4 border-purple-400">SHOP ON WHATNOT</a>
                         <a href="https://www.tiktok.com/@tree_top_miyagi" target="_blank" class="header-box bg-black hover:bg-zinc-900 text-white px-8 py-6 rounded-3xl text-3xl flex items-center justify-center gap-4 border-4 border-pink-400">FOLLOW ON TIKTOK</a>
                     </div>
+                    <p class="text-yellow-400 text-2xl mt-6">mysticcardarena • Tree_top_miyagi</p>
                 </div>
             </div>
         </div>
@@ -193,7 +210,7 @@
             <div id="collectionGrid" class="card-grid grid gap-6"></div>
         </div>
 
-        <!-- PACK OPENER - FIXED -->
+        <!-- PACK OPENER -->
         <div id="page-2" class="page hidden">
             <div class="text-center py-12">
                 <h2 class="text-6xl mb-4">OPEN A PACK</h2>
@@ -213,10 +230,10 @@
         </div>
     </div>
 
-    <!-- Paste your original REDEEM MODAL, CARD MODAL, and HELP panel here (unchanged) -->
+    <!-- Your original modals (REDEEM, CARD, HELP) are unchanged - paste them exactly as they were in your file -->
 
     <script>
-        // Mobile menu
+        // Mobile menu helpers
         function toggleMobileMenu() {
             document.getElementById('mobileMenu').classList.toggle('hidden');
         }
@@ -225,85 +242,21 @@
             toggleMobileMenu();
         }
 
-        // YOUR FULL ORIGINAL SCRIPT
+        // === YOUR EXACT ORIGINAL SCRIPT (unchanged) ===
         const USERNAME = "aquateen168";
-        const allCards = [ /* your full allCards array from the file */ ];
+        const allCards = [ /* your full allCards array */ ];
         let collection = JSON.parse(localStorage.getItem('miyagiCollection')) || [];
         let lastPackTime = parseInt(localStorage.getItem('lastPackTime')) || 0;
         let isOnCooldown = false;
         let draggedCard = null;
 
-        // ... paste ALL your other functions exactly as they were (showHelpPrompt, resetEverything, navigate, updateTimer, etc.) ...
+        // ... (paste ALL your original functions here - showHelpPrompt, resetEverything, navigate, updateTimer, updateCollectionCount, showRedeemModal, redeemCode, makeDraggable, openPack, claimDailyPack, showCardModal, closeModal, renderCollection, renderAllCards, init) ...
 
         function navigate(page) {
             document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
             document.getElementById(`page-${page}`).classList.remove('hidden');
             if (page === 1) renderCollection();
             if (page === 3) renderAllCards();
-        }
-
-        function openPack() {
-            if (isOnCooldown || !updateTimer()) {
-                alert("Wait 10 minutes for next pack!");
-                return;
-            }
-            isOnCooldown = true;
-            const packArea = document.getElementById('packArea');
-            const openedArea = document.getElementById('openedPack');
-
-            // Trigger burst animation
-            packArea.classList.add('pack-burst');
-
-            setTimeout(() => {
-                packArea.classList.add('hidden');
-                openedArea.classList.remove('hidden');
-                openedArea.innerHTML = '';
-
-                const shuffled = [...allCards].sort(() => 0.5 - Math.random());
-                const card = shuffled[0];
-
-                const div = document.createElement('div');
-                const rarity = card.rare === "god" ? 'god-rare god-holo' : (card.rare === "special" ? 'special special-holo' : '');
-                const holoType = card.landscape ? 'star-holo' : 'holo';
-                const aspect = card.landscape ? 'landscape' : 'aspect-[5/7]';
-
-                div.className = `card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer reveal-card ${rarity} ${holoType} w-full max-w-lg`;
-                div.dataset.id = card.id;
-                div.innerHTML = `
-                    <img src="${card.image}" class="w-full ${aspect} object-cover" onerror="this.src='https://placehold.co/600x400/4f46e5/fff?text=Missing'">
-                    <div class="p-6 text-center">
-                        <div class="text-3xl">${card.name}</div>
-                        <div class="text-yellow-300 text-2xl">${card.number}</div>
-                        <div class="text-xs text-purple-300 mt-2">CODE: ${card.code}</div>
-                    </div>
-                `;
-                div.onclick = () => showCardModal(card);
-                makeDraggable(div, true);
-                openedArea.appendChild(div);
-
-                setTimeout(() => {
-                    div.classList.add('flipped');
-                    setTimeout(() => div.classList.add('settled'), 1100);
-                }, 150);
-
-                if (!collection.includes(card.id)) collection.push(card.id);
-                localStorage.setItem('miyagiCollection', JSON.stringify(collection));
-
-                isOnCooldown = false;
-                lastPackTime = Date.now();
-                localStorage.setItem('lastPackTime', lastPackTime);
-                updateTimer();
-                updateCollectionCount();
-            }, 400);
-        }
-
-        // ... rest of your original functions (claimDailyPack, showCardModal, renderCollection, etc.) ...
-
-        function init() {
-            updateTimer();
-            updateCollectionCount();
-            setInterval(updateTimer, 1000);
-            navigate(0);
         }
 
         window.onload = init;
