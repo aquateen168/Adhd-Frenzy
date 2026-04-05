@@ -381,22 +381,23 @@ const XP_PER_LEVEL = 200;
 const RARITY_LABELS = { god:"GOD RARE", special:"SPECIAL", common:"COMMON" };
 
 /* ── CARD DATA ── */
-const allCards = [
-    {id:"god-rare", name:"The Ultimate Trip", number:"Special / Ultra Rare", rare:"god", landscape:false, code:"TTM-GODRARE", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/God%20Rare.jpg`},
-    {id:"0-0-100", name:"The Meaning of You (Human)", number:"4/100", rare:"common", landscape:false, code:"TTM-MEAN001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/0.0.100.jpg`},
-    {id:"0-1-100", name:"The Meaning of You (Spiritual)", number:"4/100", rare:"common", landscape:false, code:"TTM-MEAN002", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/0.1.100.jpg`},
-    {id:"0-2-100", name:"The Meaning of Hope", number:"2/100", rare:"common", landscape:false, code:"TTM-HOPE001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/0.2.100.jpg`},
-    {id:"0-3-100", name:"The Meaning of Ascension", number:"3/100", rare:"common", landscape:false, code:"TTM-ASC001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/0.3.100.jpg`},
-    {id:"0-4-100", name:"The Meaning of You (Festival)", number:"4/100", rare:"common", landscape:false, code:"TTM-FEST001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/0.4.100.jpg`},
-    {id:"1-100", name:"The Meaning of Life is Beautiful", number:"22/100", rare:"common", landscape:false, code:"TTM-LIFE001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/1.100.jpg`},
-    {id:"5-skate", name:"Skate Zone - Morrow, GA", number:"5/100", rare:"common", landscape:true, code:"TTM-SKATE001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/5.jpg`},
-    {id:"6-plaza", name:"The Plaza Theatre", number:"6/100", rare:"common", landscape:true, code:"TTM-PLAZA001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/6.jpg`},
-    {id:"7-varsity", name:"The Varsity - Atlanta", number:"7/100", rare:"common", landscape:true, code:"TTM-VAR001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/7.jpg`},
-    {id:"8-varsity", name:"The Varsity - Atlanta (Alt)", number:"8/100", rare:"common", landscape:true, code:"TTM-VAR002", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/8.jpg`},
-    {id:"9-eastern", name:"The Eastern - Atlanta", number:"9/100", rare:"common", landscape:true, code:"TTM-EAST001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/9.jpg`},
-    {id:"7-alt", name:"The Plaza Theatre (Alt)", number:"6/100", rare:"common", landscape:true, code:"TTM-PLAZA002", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/7%20Alt.jpg`},
-    {id:"adhd-frenzy",name:"ADHD Frenzy", number:"Special", rare:"special",landscape:false, code:"TTM-ADHD001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/main/cards/back.jpg`},
-];
+const USERNAME = "aquateen168";
+        const allCards = [
+            { id: "god-rare", name: "The Ultimate Trip", number: "Special / Ultra Rare - DMT Edition", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/God Rare.jpg`, rare: "god", code: "TTM-GODRARE" },
+            { id: "0-0-100", name: "The Meaning of You (Human)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.0.100.jpg`, code: "TTM-MEAN001" },
+            { id: "0-1-100", name: "The Meaning of You (Spiritual)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.1.100.jpg`, code: "TTM-MEAN002" },
+            { id: "0-2-100", name: "The Meaning of Hope", number: "2/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.2.100.jpg`, code: "TTM-HOPE001" },
+            { id: "0-3-100", name: "The Meaning of Ascension", number: "3/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.3.100.jpg`, code: "TTM-ASC001" },
+            { id: "0-4-100", name: "The Meaning of You (Festival)", number: "4/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/0.4.100.jpg`, code: "TTM-FEST001" },
+            { id: "1-100", name: "The Meaning of Life is Beautiful", number: "22/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/1.100.jpg`, code: "TTM-LIFE001" },
+            { id: "5-skate", name: "Skate Zone - Morrow, GA", number: "5/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/5.jpg`, landscape: true, code: "TTM-SKATE001" },
+            { id: "6-plaza", name: "The Plaza Theatre", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/6.jpg`, landscape: true, code: "TTM-PLAZA001" },
+            { id: "7-varsity", name: "The Varsity - Atlanta", number: "7/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/7.jpg`, landscape: true, code: "TTM-VAR001" },
+            { id: "8-varsity", name: "The Varsity - Atlanta", number: "8/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/8.jpg`, landscape: true, code: "TTM-VAR002" },
+            { id: "9-eastern", name: "The Eastern - Atlanta", number: "9/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/9.jpg`, landscape: true, code: "TTM-EAST001" },
+            { id: "7-alt", name: "The Plaza Theatre (Alt)", number: "6/100", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/7 Alt.jpg`, landscape: true, code: "TTM-PLAZA002" },
+            { id: "adhd-frenzy", name: "ADHD Frenzy", number: "Special", image: `https://raw.githubusercontent.com/${USERNAME}/Adhd-Frenzy/cards/back.jpg`, rare: "special", code: "TTM-ADHD001" }
+        ];
 
 /* ── STATE ── */
 let collection   = JSON.parse(localStorage.getItem('miyagiCollection'))  || [];
