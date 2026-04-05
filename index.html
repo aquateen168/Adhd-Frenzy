@@ -12,7 +12,7 @@
         *{ box-sizing:border-box; }
         body{ background:#060614; color:#fff; font-family:'VT323',monospace; position:relative; overflow-x:hidden; }
 
-        /* ── PURE NEBULA GALAXY BACKGROUND (no mountain) ── */
+        /* ── GALAXY BACKGROUND ── */
         #galaxyCanvas{ position:fixed; top:0; left:0; width:100%; height:100%; z-index:-2; pointer-events:none; }
 
         /* ── GAME LAYERS ── */
@@ -37,6 +37,7 @@
         .badge-god    { background:linear-gradient(90deg,#ffd700,#ff8c00); color:#000; }
         .badge-special{ background:linear-gradient(90deg,#c026d3,#7c3aed); color:#fff; }
         .badge-common { background:rgba(255,255,255,.12); color:#ccc; border:1px solid #555; }
+        .badge-reward { background:linear-gradient(90deg,#22c55e,#16a34a); color:#fff; }
         .new-badge{ position:absolute; top:8px; right:8px; background:linear-gradient(90deg,#22c55e,#16a34a); color:#fff; padding:2px 8px; border-radius:9999px; font-size:12px; font-weight:bold; z-index:5; animation:newPop .5s ease-out; pointer-events:none; }
         @keyframes newPop{ 0%{transform:scale(0) rotate(-20deg)} 70%{transform:scale(1.2) rotate(5deg)} 100%{transform:scale(1)} }
 
@@ -126,10 +127,6 @@
         #rewardModal{ position:fixed; inset:0; background:rgba(0,0,0,.97); z-index:9200; display:none; align-items:center; justify-content:center; padding:1rem; }
         #rewardModal.show{ display:flex; }
 
-        /* ── EXPORT MODAL ── */
-        #exportModal{ position:fixed; inset:0; background:rgba(0,0,0,.95); z-index:99999; display:none; align-items:center; justify-content:center; }
-        #exportModal.show{ display:flex; }
-
         ::-webkit-scrollbar{ width:5px; }
         ::-webkit-scrollbar-track{ background:rgba(255,255,255,.04); }
         ::-webkit-scrollbar-thumb{ background:rgba(255,215,0,.35); border-radius:9999px; }
@@ -137,7 +134,10 @@
 </head>
 <body class="min-h-screen pb-20">
 
+<!-- GALAXY BACKGROUND CANVAS -->
 <canvas id="galaxyCanvas"></canvas>
+
+<!-- GAME LAYERS -->
 <canvas id="particleCanvas"></canvas>
 <div id="flashOverlay"></div>
 <div id="toastContainer"></div>
@@ -153,7 +153,7 @@
     <div class="z-10 mt-6 text-yellow-400 text-2xl animate-bounce">TAP TO CONTINUE</div>
 </div>
 
-<!-- HEADER -->
+<!-- ══════════ HEADER ══════════ -->
 <header class="bg-black/90 border-b-4 border-yellow-400 py-3 sticky top-0 z-50 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 flex items-center justify-between gap-3 flex-wrap">
         <div class="flex items-center gap-3 cursor-pointer" onclick="navigate(0)">
@@ -195,9 +195,10 @@
     </div>
 </header>
 
-<!-- PAGES -->
+<!-- ══════════ PAGES ══════════ -->
 <div id="pageContainer" class="max-w-7xl mx-auto px-4 pt-8">
-    <!-- PAGE 0 HOME -->
+
+    <!-- PAGE 0 · HOME -->
     <div id="page-0" class="page">
         <div class="text-center py-14">
             <h1 class="text-8xl font-bold rainbow-text mb-2">THE ULTIMATE TRIP</h1>
@@ -232,7 +233,7 @@
         </div>
     </div>
 
-    <!-- PAGE 1 COLLECTION -->
+    <!-- PAGE 1 · COLLECTION -->
     <div id="page-1" class="page hidden">
         <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
             <h2 class="text-5xl">YOUR COLLECTION <span id="progress" class="text-yellow-300"></span></h2>
@@ -245,7 +246,7 @@
         <div id="collectionGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5"></div>
     </div>
 
-    <!-- PAGE 2 PACK OPENER -->
+    <!-- PAGE 2 · PACK OPENER -->
     <div id="page-2" class="page hidden">
         <div class="text-center py-8">
             <h2 class="text-6xl mb-2">OPEN A PACK</h2>
@@ -269,7 +270,7 @@
         </div>
     </div>
 
-    <!-- PAGE 3 ALL CARDS -->
+    <!-- PAGE 3 · ALL CARDS -->
     <div id="page-3" class="page hidden">
         <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
             <h2 class="text-5xl">ALL CARDS</h2>
@@ -283,7 +284,7 @@
         <div id="allCardsGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5"></div>
     </div>
 
-    <!-- PAGE 4 QUESTS -->
+    <!-- PAGE 4 · QUESTS + ACHIEVEMENTS -->
     <div id="page-4" class="page hidden">
         <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
             <h2 class="text-5xl">DAILY QUESTS</h2>
@@ -297,7 +298,7 @@
         <div id="achievementsGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
     </div>
 
-    <!-- PAGE 5 TRADE -->
+    <!-- PAGE 5 · TRADE -->
     <div id="page-5" class="page hidden">
         <h2 class="text-5xl mb-3">TRADE SIMULATOR</h2>
         <p class="text-zinc-400 text-2xl mb-6">Click a card below to offer it, then draw a random card in return</p>
@@ -318,7 +319,7 @@
         </div>
     </div>
 
-    <!-- PAGE 6 STATS -->
+    <!-- PAGE 6 · STATS -->
     <div id="page-6" class="page hidden">
         <h2 class="text-5xl mb-7">YOUR STATS</h2>
         <div class="grid md:grid-cols-2 gap-8">
@@ -353,17 +354,21 @@
             <div id="fullPullLog" class="max-h-80 overflow-y-auto"></div>
         </div>
     </div>
-</div>
+
+</div><!-- /pageContainer -->
+
+<!-- ══════════ MODALS ══════════ -->
 
 <!-- REDEEM MODAL -->
 <div id="redeemModal" class="hidden fixed inset-0 bg-black/90 items-center justify-center z-[200] p-4">
     <div class="bg-black border-8 border-purple-400 rounded-3xl max-w-md w-full p-8 mx-4">
         <h2 class="text-4xl text-center mb-2">REDEEM CODE</h2>
         <p class="text-zinc-400 text-xl text-center mb-5">Enter a card code or reward code below</p>
-        <input id="redeemInput" type="text" placeholder="TTM-GODRARE" onkeydown="if(event.key==='Enter')redeemCode()" class="w-full bg-zinc-900 border-2 border-purple-400 text-white text-2xl p-4 rounded-2xl text-center font-bold uppercase">
+        <input id="redeemInput" type="text" placeholder="TTM-GODRARE" onkeydown="if(event.key==='Enter')redeemCode()"
+               class="w-full bg-zinc-900 border-2 border-purple-400 text-white text-2xl p-4 rounded-2xl text-center font-bold uppercase">
         <div class="flex gap-4 mt-6">
             <button onclick="closeRedeemModal()" class="flex-1 bg-zinc-800 hover:bg-zinc-700 py-3 rounded-3xl text-xl">CANCEL</button>
-            <button onclick="redeemCode()" class="flex-1 bg-purple-500 hover:bg-purple-400 py-3 rounded-3xl text-xl text-black font-bold">REDEEM</button>
+            <button onclick="redeemCode()"        class="flex-1 bg-purple-500 hover:bg-purple-400 py-3 rounded-3xl text-xl text-black font-bold">REDEEM</button>
         </div>
     </div>
 </div>
@@ -385,7 +390,7 @@
     </div>
 </div>
 
-<!-- REWARD MODAL -->
+<!-- REWARD CLAIMED MODAL -->
 <div id="rewardModal">
     <div class="bg-black border-8 border-green-400 rounded-3xl max-w-md w-full overflow-hidden" style="box-shadow:0 0 80px rgba(34,197,94,0.6)">
         <div class="bg-gradient-to-b from-green-900/60 to-transparent p-6 text-center border-b border-green-500/30">
@@ -405,9 +410,10 @@
     </div>
 </div>
 
-<!-- ADMIN MODAL -->
+<!-- ══════════ ADMIN MODAL ══════════ -->
 <div id="adminModal" class="hidden fixed inset-0 bg-black/97 z-[9500] overflow-auto">
     <div class="max-w-2xl mx-auto px-4 py-6">
+        <!-- Sticky header -->
         <div class="flex justify-between items-center mb-6 pb-4 border-b-2 border-yellow-400/30 sticky top-0 bg-black/98 backdrop-blur-sm pt-2 z-10">
             <div>
                 <h2 class="text-4xl text-yellow-300">⚙️ ADMIN PANEL</h2>
@@ -416,53 +422,91 @@
             <button onclick="closeAdminPanel()" class="text-zinc-400 hover:text-white text-4xl transition-colors leading-none">✕</button>
         </div>
 
-        <!-- LOCK -->
+        <!-- LOCK SCREEN -->
         <div id="adminLock" class="max-w-sm mx-auto py-12 space-y-4">
             <div class="text-center mb-8">
                 <div class="text-7xl mb-4">🔐</div>
                 <p class="text-zinc-400 text-xl">Enter the admin password to unlock the panel</p>
             </div>
-            <input id="adminPassInput" type="password" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminPass()" class="admin-input text-center text-2xl">
+            <input id="adminPassInput" type="password" placeholder="Password"
+                   onkeydown="if(event.key==='Enter')checkAdminPass()"
+                   class="admin-input text-center text-2xl">
             <button onclick="checkAdminPass()" class="w-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-3 rounded-3xl text-xl transition-all hover:scale-105">🔓 UNLOCK</button>
         </div>
 
-        <!-- CONTENT -->
+        <!-- ADMIN CONTENT (shown after unlock) -->
         <div id="adminContent" class="hidden">
+            <!-- Tab buttons -->
             <div class="flex gap-3 mb-8 flex-wrap">
-                <button id="adminTabBtn-reset" onclick="adminTab('reset')" class="admin-tab-btn">🔄 RESET TOOLS</button>
-                <button id="adminTabBtn-cards" onclick="adminTab('cards')" class="admin-tab-btn">🃏 CARD MANAGER</button>
+                <button id="adminTabBtn-reset"   onclick="adminTab('reset')"   class="admin-tab-btn">🔄 RESET TOOLS</button>
+                <button id="adminTabBtn-cards"   onclick="adminTab('cards')"   class="admin-tab-btn">🃏 CARD MANAGER</button>
                 <button id="adminTabBtn-rewards" onclick="adminTab('rewards')" class="admin-tab-btn">🎁 REWARDS</button>
             </div>
 
-            <!-- RESET TAB -->
+            <!-- ── RESET TAB ── -->
             <div id="adminPane-reset" class="space-y-4">
                 <div class="bg-red-950/60 border border-red-500/30 rounded-3xl p-6">
                     <h3 class="text-2xl text-red-300 mb-1">⚠️ Danger Zone</h3>
                     <p class="text-zinc-500 text-lg mb-5">These actions cannot be undone.</p>
                     <div class="space-y-3">
-                        <button onclick="resetEverything()" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-3 rounded-3xl flex items-center justify-center gap-2 text-xl transition-all"><i class="fa-solid fa-rotate-right"></i> FULL RESET — Wipes All Player Data</button>
-                        <button onclick="resetTimerOnly()" class="w-full bg-orange-700 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-3xl flex items-center justify-center gap-2 text-xl transition-all"><i class="fa-solid fa-clock"></i> RESET TIMER ONLY — Pack Becomes Available Now</button>
+                        <button onclick="resetEverything()" class="w-full bg-red-700 hover:bg-red-600 text-white font-bold px-6 py-3 rounded-3xl flex items-center justify-center gap-2 text-xl transition-all">
+                            <i class="fa-solid fa-rotate-right"></i> FULL RESET — Wipes All Player Data
+                        </button>
+                        <button onclick="resetTimerOnly()" class="w-full bg-orange-700 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-3xl flex items-center justify-center gap-2 text-xl transition-all">
+                            <i class="fa-solid fa-clock"></i> RESET TIMER ONLY — Pack Becomes Available Now
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- CARD MANAGER TAB -->
+            <!-- ── CARD MANAGER TAB ── -->
             <div id="adminPane-cards" class="hidden space-y-6">
+                <!-- Add card form -->
                 <div class="bg-zinc-900/70 border border-yellow-400/25 rounded-3xl p-6 space-y-4">
                     <h3 class="text-2xl text-yellow-300 mb-1">➕ Add New Card</h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="col-span-2"><label class="text-zinc-400 text-base block mb-1">Card Name *</label><input id="newCardName" class="admin-input" placeholder="My Awesome Card"></div>
-                        <div><label class="text-zinc-400 text-base block mb-1">Rarity</label><select id="newCardRarity" class="admin-input"><option value="common">◆ COMMON</option><option value="special">💜 SPECIAL</option><option value="god">✨ GOD RARE</option></select></div>
-                        <div><label class="text-zinc-400 text-base block mb-1">Card Number</label><input id="newCardNumber" class="admin-input" placeholder="15/100"></div>
-                        <div class="col-span-2"><label class="text-zinc-400 text-base block mb-1">Redeem Code (optional)</label><input id="newCardCode" class="admin-input" placeholder="TTM-MYCARD01"></div>
-                        <div class="col-span-2"><label class="text-zinc-400 text-base block mb-1">📎 Raw Image URL *</label><input id="newCardImage" class="admin-input" placeholder="https://raw.githubusercontent.com/..."><p class="text-zinc-600 text-sm mt-1">Use the raw GitHub URL</p></div>
+                        <div class="col-span-2">
+                            <label class="text-zinc-400 text-base block mb-1">Card Name *</label>
+                            <input id="newCardName" class="admin-input" placeholder="My Awesome Card">
+                        </div>
+                        <div>
+                            <label class="text-zinc-400 text-base block mb-1">Rarity</label>
+                            <select id="newCardRarity" class="admin-input">
+                                <option value="common">◆ COMMON</option>
+                                <option value="special">💜 SPECIAL</option>
+                                <option value="god">✨ GOD RARE</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-zinc-400 text-base block mb-1">Card Number</label>
+                            <input id="newCardNumber" class="admin-input" placeholder="15/100">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="text-zinc-400 text-base block mb-1">Redeem Code (optional)</label>
+                            <input id="newCardCode" class="admin-input" placeholder="TTM-MYCARD01">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="text-zinc-400 text-base block mb-1">📎 Raw Image URL *</label>
+                            <input id="newCardImage" class="admin-input" placeholder="https://raw.githubusercontent.com/user/repo/branch/filename.jpg">
+                            <p class="text-zinc-600 text-sm mt-1">Use the raw GitHub URL — e.g. right-click → Copy Image Address</p>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-3 py-1"><input type="checkbox" id="newCardLandscape" class="w-5 h-5 accent-yellow-400"><label for="newCardLandscape" class="text-zinc-300 text-lg cursor-pointer">Landscape orientation (7:5 ratio cards)</label></div>
-                    <div id="cardPreviewWrap" class="hidden"><p class="text-zinc-500 text-base mb-2">Preview:</p><img id="cardPreview" src="" class="max-h-32 rounded-xl border border-yellow-400/30" style="pointer-events:none"></div>
+                    <div class="flex items-center gap-3 py-1">
+                        <input type="checkbox" id="newCardLandscape" class="w-5 h-5 accent-yellow-400">
+                        <label for="newCardLandscape" class="text-zinc-300 text-lg cursor-pointer">Landscape orientation (7:5 ratio cards)</label>
+                    </div>
+                    <!-- Preview -->
+                    <div id="cardPreviewWrap" class="hidden">
+                        <p class="text-zinc-500 text-base mb-2">Preview:</p>
+                        <img id="cardPreview" src="" class="max-h-32 rounded-xl border border-yellow-400/30" style="pointer-events:none">
+                    </div>
                     <button onclick="previewCard()" class="w-full bg-zinc-700 hover:bg-zinc-600 text-white py-2 rounded-2xl text-lg mb-1">👁 PREVIEW IMAGE</button>
-                    <button onclick="addCustomCard()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-3xl text-xl transition-all hover:scale-105">➕ ADD CARD TO DECK</button>
+                    <button onclick="addCustomCard()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-3xl text-xl transition-all hover:scale-105">
+                        ➕ ADD CARD TO DECK
+                    </button>
                 </div>
 
+                <!-- Card list -->
                 <div>
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-2xl text-yellow-300">Current Cards</h3>
@@ -472,22 +516,41 @@
                 </div>
             </div>
 
-            <!-- REWARDS TAB -->
+            <!-- ── REWARDS TAB ── -->
             <div id="adminPane-rewards" class="hidden space-y-6">
+                <!-- Explanation -->
                 <div class="bg-green-950/40 border border-green-500/25 rounded-2xl p-4">
                     <p class="text-green-300 text-xl mb-1">🎁 How Rewards Work</p>
-                    <p class="text-zinc-400 text-lg">Create a reward card with a unique code. Hand the physical card or code to a customer. They enter the code in the CODE button — it's redeemable once per device.</p>
+                    <p class="text-zinc-400 text-lg">Create a reward card with a unique code. Hand the physical card or code to a customer. They enter the code in the CODE button — it's redeemable once per device and shows a custom reward message.</p>
                 </div>
+
+                <!-- Add reward form -->
                 <div class="bg-zinc-900/70 border border-green-500/25 rounded-3xl p-6 space-y-4">
                     <h3 class="text-2xl text-green-300">➕ Add Reward Card</h3>
                     <div class="grid grid-cols-2 gap-3">
-                        <div><label class="text-zinc-400 text-base block mb-1">Reward Name *</label><input id="newRewardName" class="admin-input" placeholder="Free Pack"></div>
-                        <div><label class="text-zinc-400 text-base block mb-1">Unique Code *</label><input id="newRewardCode" class="admin-input" placeholder="REWARD-XYZ123"></div>
-                        <div class="col-span-2"><label class="text-zinc-400 text-base block mb-1">Reward Description</label><input id="newRewardDesc" class="admin-input" placeholder="Show this screen at our booth for a free pack!"></div>
-                        <div class="col-span-2"><label class="text-zinc-400 text-base block mb-1">📎 Card Image URL (optional)</label><input id="newRewardImage" class="admin-input" placeholder="https://raw.githubusercontent.com/..."></div>
+                        <div>
+                            <label class="text-zinc-400 text-base block mb-1">Reward Name *</label>
+                            <input id="newRewardName" class="admin-input" placeholder="Free Pack">
+                        </div>
+                        <div>
+                            <label class="text-zinc-400 text-base block mb-1">Unique Code *</label>
+                            <input id="newRewardCode" class="admin-input" placeholder="REWARD-XYZ123">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="text-zinc-400 text-base block mb-1">Reward Description (shown when redeemed)</label>
+                            <input id="newRewardDesc" class="admin-input" placeholder="Show this screen at our booth for a free pack!">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="text-zinc-400 text-base block mb-1">📎 Card Image URL (optional)</label>
+                            <input id="newRewardImage" class="admin-input" placeholder="https://raw.githubusercontent.com/...">
+                        </div>
                     </div>
-                    <button onclick="addReward()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-3xl text-xl transition-all hover:scale-105">🎁 CREATE REWARD CARD</button>
+                    <button onclick="addReward()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-3xl text-xl transition-all hover:scale-105">
+                        🎁 CREATE REWARD CARD
+                    </button>
                 </div>
+
+                <!-- Reward list -->
                 <div>
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="text-2xl text-green-300">Active Rewards</h3>
@@ -506,7 +569,9 @@
 </div>
 
 <script>
-/* GALAXY BACKGROUND */
+/* ══════════════════════════════════════
+   GALAXY BACKGROUND RENDERER
+══════════════════════════════════════ */
 (function initGalaxy(){
     const canvas=document.getElementById('galaxyCanvas');
     const ctx=canvas.getContext('2d');
@@ -514,104 +579,781 @@
     function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
     resize(); window.addEventListener('resize',resize);
 
+    // Stars
     const STARS=[];
     for(let i=0;i<700;i++){
-        STARS.push({x:Math.random(), y:Math.random(), r:0.25+Math.random()*1.9, phase:Math.random()*Math.PI*2, spd:0.4+Math.random()*2.2, hue:Math.random()<0.12?Math.floor(Math.random()*360):null});
+        STARS.push({
+            x:Math.random(), y:Math.random(),
+            r:0.25+Math.random()*1.9,
+            phase:Math.random()*Math.PI*2,
+            spd:0.4+Math.random()*2.2,
+            hue:Math.random()<0.12?Math.floor(Math.random()*360):null
+        });
     }
-    const NEBS=[{cx:0.18,cy:0.30,r:0.42,h:278},{cx:0.82,cy:0.65,r:0.38,h:192},{cx:0.55,cy:0.12,r:0.32,h:325},{cx:0.30,cy:0.80,r:0.40,h:48},{cx:0.72,cy:0.42,r:0.30,h:258},{cx:0.08,cy:0.60,r:0.28,h:165},{cx:0.90,cy:0.22,r:0.25,h:15}];
+
+    // Nebula blob definitions
+    const NEBS=[
+        {cx:0.18,cy:0.30,r:0.42,h:278},  // purple
+        {cx:0.82,cy:0.65,r:0.38,h:192},  // cyan
+        {cx:0.55,cy:0.12,r:0.32,h:325},  // pink/magenta
+        {cx:0.30,cy:0.80,r:0.40,h:48},   // gold/amber
+        {cx:0.72,cy:0.42,r:0.30,h:258},  // violet
+        {cx:0.08,cy:0.60,r:0.28,h:165},  // teal
+        {cx:0.90,cy:0.22,r:0.25,h:15},   // red/orange
+    ];
 
     let t=0;
     function frame(){
         t+=0.007;
-        ctx.fillStyle='#060614'; ctx.fillRect(0,0,W,H);
-        ctx.globalCompositeOperation='screen';
-        NEBS.forEach((n,i)=>{ const hue=(n.h + t*14 + i*22)%360; const cx=(n.cx+Math.sin(t*0.28+i*1.35)*0.075)*W; const cy=(n.cy+Math.cos(t*0.22+i*0.95)*0.065)*H; const r=n.r*Math.min(W,H);
-            const gr=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
-            gr.addColorStop(0,`hsla(${hue},100%,68%,0.30)`); gr.addColorStop(0.25,`hsla(${(hue+25)%360},95%,58%,0.20)`); gr.addColorStop(0.55,`hsla(${(hue+55)%360},85%,48%,0.11)`); gr.addColorStop(0.80,`hsla(${(hue+90)%360},75%,38%,0.05)`); gr.addColorStop(1,'transparent');
-            ctx.save(); ctx.translate(cx,cy); ctx.rotate(t*0.045*(i%2===0?1:-1)); ctx.scale(1+Math.sin(t*0.33+i)*0.09,1+Math.cos(t*0.27+i)*0.09); ctx.translate(-cx,-cy);
-            ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fillStyle=gr; ctx.fill(); ctx.restore();
-        });
+        ctx.globalAlpha=1;
         ctx.globalCompositeOperation='source-over';
-        STARS.forEach(s=>{ const x=s.x*W, y=s.y*H; const twinkle=0.25+0.75*Math.abs(Math.sin(t*s.spd+s.phase)); ctx.globalAlpha=twinkle; ctx.fillStyle=s.hue!==null?`hsl(${(s.hue+t*25)%360},100%,82%)`:'#ffffff';
-            ctx.beginPath(); ctx.arc(x,y,s.r,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle='#060614';
+        ctx.fillRect(0,0,W,H);
+
+        // Nebulae — screen blend for LSD glow overlap
+        ctx.globalCompositeOperation='screen';
+        NEBS.forEach((n,i)=>{
+            const hue=(n.h + t*14 + i*22)%360;
+            const cx=(n.cx+Math.sin(t*0.28+i*1.35)*0.075)*W;
+            const cy=(n.cy+Math.cos(t*0.22+i*0.95)*0.065)*H;
+            const r=n.r*Math.min(W,H);
+            const gr=ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+            gr.addColorStop(0,  `hsla(${hue},100%,68%,0.30)`);
+            gr.addColorStop(0.25,`hsla(${(hue+25)%360},95%,58%,0.20)`);
+            gr.addColorStop(0.55,`hsla(${(hue+55)%360},85%,48%,0.11)`);
+            gr.addColorStop(0.80,`hsla(${(hue+90)%360},75%,38%,0.05)`);
+            gr.addColorStop(1,  'transparent');
+            ctx.save();
+            ctx.translate(cx,cy);
+            ctx.rotate(t*0.045*(i%2===0?1:-1));
+            ctx.scale(1+Math.sin(t*0.33+i)*0.09, 1+Math.cos(t*0.27+i)*0.09);
+            ctx.translate(-cx,-cy);
+            ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2);
+            ctx.fillStyle=gr; ctx.fill();
+            ctx.restore();
         });
+
+        // Swirling galaxy arm effect
+        ctx.globalCompositeOperation='screen';
+        const armHue=(t*8)%360;
+        for(let arm=0;arm<2;arm++){
+            const ag=ctx.createRadialGradient(W*.5,H*.5,0,W*.5,H*.5,Math.min(W,H)*0.55);
+            ag.addColorStop(0,`hsla(${(armHue+arm*180)%360},80%,60%,0.07)`);
+            ag.addColorStop(0.5,`hsla(${(armHue+arm*180+40)%360},70%,50%,0.04)`);
+            ag.addColorStop(1,'transparent');
+            ctx.save();
+            ctx.translate(W*.5,H*.5);
+            ctx.rotate(t*0.06+arm*Math.PI);
+            ctx.scale(1.6,0.5);
+            ctx.translate(-W*.5,-H*.5);
+            ctx.beginPath(); ctx.arc(W*.5,H*.5,Math.min(W,H)*0.5,0,Math.PI*2);
+            ctx.fillStyle=ag; ctx.fill();
+            ctx.restore();
+        }
+
+        // Stars
+        ctx.globalCompositeOperation='source-over';
+        STARS.forEach(s=>{
+            const x=s.x*W, y=s.y*H;
+            const twinkle=0.25+0.75*Math.abs(Math.sin(t*s.spd+s.phase));
+            ctx.globalAlpha=twinkle;
+            if(s.hue!==null){
+                ctx.fillStyle=`hsl(${(s.hue+t*25)%360},100%,82%)`;
+            } else {
+                ctx.fillStyle='#ffffff';
+            }
+            ctx.beginPath(); ctx.arc(x,y,s.r,0,Math.PI*2); ctx.fill();
+            // Star cross sparkle for larger stars
+            if(s.r>1.4 && twinkle>0.7){
+                ctx.globalAlpha=twinkle*0.4;
+                ctx.strokeStyle=ctx.fillStyle;
+                ctx.lineWidth=0.6;
+                ctx.beginPath();
+                ctx.moveTo(x-s.r*3,y); ctx.lineTo(x+s.r*3,y);
+                ctx.moveTo(x,y-s.r*3); ctx.lineTo(x,y+s.r*3);
+                ctx.stroke();
+            }
+        });
+
+        ctx.globalAlpha=1;
+        ctx.globalCompositeOperation='source-over';
         requestAnimationFrame(frame);
     }
     frame();
 })();
 
-/* CONSTANTS & DEFAULT CARDS */
-const COOLDOWN_MS = 600000;
-const ADMIN_PASS = "tree";
-const PITY_MAX = 5;
-const XP_PER_PULL = 20;
-const XP_PER_RARE = 80;
-const XP_PER_LEVEL = 200;
+/* ══════════════════════════════════════
+   CONSTANTS
+══════════════════════════════════════ */
+const USERNAME      = "aquateen168";
+const COOLDOWN_MS   = 600_000;
+const ADMIN_PASS    = "tree";
+const PITY_MAX      = 5;
+const XP_PER_PULL   = 20;
+const XP_PER_RARE   = 80;
+const XP_PER_LEVEL  = 200;
 const RARITY_LABELS = { god:"GOD RARE", special:"SPECIAL", common:"COMMON" };
 
-let allCards = [ /* your original 14 cards here */ 
-    {id:"god-rare", name:"The Ultimate Trip", number:"Special / Ultra Rare", rare:"god", landscape:false, code:"TTM-GODRARE", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/God%20Rare.jpg"},
-    {id:"0-0-100", name:"The Meaning of You (Human)", number:"4/100", rare:"common", landscape:false, code:"TTM-MEAN001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.0.100.jpg"},
-    {id:"0-1-100", name:"The Meaning of You (Spiritual)", number:"4/100", rare:"common", landscape:false, code:"TTM-MEAN002", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.1.100.jpg"},
-    {id:"0-2-100", name:"The Meaning of Hope", number:"2/100", rare:"common", landscape:false, code:"TTM-HOPE001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.2.100.jpg"},
-    {id:"0-3-100", name:"The Meaning of Ascension", number:"3/100", rare:"common", landscape:false, code:"TTM-ASC001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.3.100.jpg"},
-    {id:"0-4-100", name:"The Meaning of You (Festival)", number:"4/100", rare:"common", landscape:false, code:"TTM-FEST001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.4.100.jpg"},
-    {id:"1-100", name:"The Meaning of Life is Beautiful", number:"22/100", rare:"common", landscape:false, code:"TTM-LIFE001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/1.100.jpg"},
-    {id:"5-skate", name:"Skate Zone - Morrow, GA", number:"5/100", rare:"common", landscape:true, code:"TTM-SKATE001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/5.jpg"},
-    {id:"6-plaza", name:"The Plaza Theatre", number:"6/100", rare:"common", landscape:true, code:"TTM-PLAZA001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/6.jpg"},
-    {id:"7-varsity", name:"The Varsity - Atlanta", number:"7/100", rare:"common", landscape:true, code:"TTM-VAR001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/7.jpg"},
-    {id:"8-varsity", name:"The Varsity - Atlanta (Alt)", number:"8/100", rare:"common", landscape:true, code:"TTM-VAR002", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/8.jpg"},
-    {id:"9-eastern", name:"The Eastern - Atlanta", number:"9/100", rare:"common", landscape:true, code:"TTM-EAST001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/9.jpg"},
-    {id:"7-alt", name:"The Plaza Theatre (Alt)", number:"6/100", rare:"common", landscape:true, code:"TTM-PLAZA002", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/7%20Alt.jpg"},
-    {id:"adhd-frenzy", name:"ADHD Frenzy", number:"Special", rare:"special", landscape:false, code:"TTM-ADHD001", image:"https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/back.jpg"}
+/* ══════════════════════════════════════
+   CARD DATA (base set)
+══════════════════════════════════════ */
+let allCards = [
+    {id:"god-rare",   name:"The Ultimate Trip",                number:"Special / Ultra Rare",    rare:"god",    landscape:false, code:"TTM-GODRARE",  image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/God%20Rare.jpg`},
+    {id:"0-0-100",    name:"The Meaning of You (Human)",       number:"4/100",                   rare:"common", landscape:false, code:"TTM-MEAN001",  image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.0.100.jpg`},
+    {id:"0-1-100",    name:"The Meaning of You (Spiritual)",   number:"4/100",                   rare:"common", landscape:false, code:"TTM-MEAN002",  image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.1.100.jpg`},
+    {id:"0-2-100",    name:"The Meaning of Hope",              number:"2/100",                   rare:"common", landscape:false, code:"TTM-HOPE001",  image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.2.100.jpg`},
+    {id:"0-3-100",    name:"The Meaning of Ascension",         number:"3/100",                   rare:"common", landscape:false, code:"TTM-ASC001",   image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.3.100.jpg`},
+    {id:"0-4-100",    name:"The Meaning of You (Festival)",    number:"4/100",                   rare:"common", landscape:false, code:"TTM-FEST001",  image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/0.4.100.jpg`},
+    {id:"1-100",      name:"The Meaning of Life is Beautiful", number:"22/100",                  rare:"common", landscape:false, code:"TTM-LIFE001",  image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/1.100.jpg`},
+    {id:"5-skate",    name:"Skate Zone - Morrow, GA",          number:"5/100",                   rare:"common", landscape:true,  code:"TTM-SKATE001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/5.jpg`},
+    {id:"6-plaza",    name:"The Plaza Theatre",                number:"6/100",                   rare:"common", landscape:true,  code:"TTM-PLAZA001", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/6.jpg`},
+    {id:"7-varsity",  name:"The Varsity - Atlanta",            number:"7/100",                   rare:"common", landscape:true,  code:"TTM-VAR001",   image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/7.jpg`},
+    {id:"8-varsity",  name:"The Varsity - Atlanta (Alt)",      number:"8/100",                   rare:"common", landscape:true,  code:"TTM-VAR002",   image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/8.jpg`},
+    {id:"9-eastern",  name:"The Eastern - Atlanta",            number:"9/100",                   rare:"common", landscape:true,  code:"TTM-EAST001",  image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/9.jpg`},
+    {id:"7-alt",      name:"The Plaza Theatre (Alt)",          number:"6/100",                   rare:"common", landscape:true,  code:"TTM-PLAZA002", image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/7%20Alt.jpg`},
+    {id:"adhd-frenzy",name:"ADHD Frenzy",                     number:"Special",                 rare:"special",landscape:false, code:"TTM-ADHD001",  image:`https://raw.githubusercontent.com/aquateen168/Adhd-Frenzy/cards/back.jpg`},
 ];
 
+/* ══════════════════════════════════════
+   LOAD CUSTOM CARDS
+══════════════════════════════════════ */
 let customCards = JSON.parse(localStorage.getItem('miyagiCustomCards')) || [];
 customCards.forEach(cc => { if(!allCards.find(c=>c.id===cc.id)) allCards.push(cc); });
 
-let rewardCards = JSON.parse(localStorage.getItem('miyagiRewardCards')) || [];
-let redeemedRewards = JSON.parse(localStorage.getItem('miyagiRedeemedRewards')) || [];
+/* ══════════════════════════════════════
+   REWARD SYSTEM
+══════════════════════════════════════ */
+let rewardCards     = JSON.parse(localStorage.getItem('miyagiRewardCards'))    || [];
+let redeemedRewards = JSON.parse(localStorage.getItem('miyagiRedeemedRewards'))|| [];
+function saveRewards(){
+    localStorage.setItem('miyagiRewardCards',     JSON.stringify(rewardCards));
+    localStorage.setItem('miyagiRedeemedRewards', JSON.stringify(redeemedRewards));
+}
 
-let collection = JSON.parse(localStorage.getItem('miyagiCollection')) || [];
-let lastPackTime = parseInt(localStorage.getItem('lastPackTime')) || 0;
-let pullCount = parseInt(localStorage.getItem('miyagiPulls')) || 0;
-let pityCount = parseInt(localStorage.getItem('miyagiPity')) || 0;
-let xp = parseInt(localStorage.getItem('miyagiXP')) || 0;
-let pullHistory = JSON.parse(localStorage.getItem('miyagiHistory')) || [];
-let questData = JSON.parse(localStorage.getItem('miyagiQuests')) || {};
-let achievements = JSON.parse(localStorage.getItem('miyagiAchievements')) || {};
-let sortMode = 'order', filterMode = 'all', tradeOffer = null, isOnCooldown = false;
+/* ══════════════════════════════════════
+   PLAYER STATE
+══════════════════════════════════════ */
+let collection   = JSON.parse(localStorage.getItem('miyagiCollection'))  || [];
+let lastPackTime = parseInt(localStorage.getItem('lastPackTime'))          || 0;
+let pullCount    = parseInt(localStorage.getItem('miyagiPulls'))           || 0;
+let pityCount    = parseInt(localStorage.getItem('miyagiPity'))            || 0;
+let xp           = parseInt(localStorage.getItem('miyagiXP'))              || 0;
+let pullHistory  = JSON.parse(localStorage.getItem('miyagiHistory'))       || [];
+let questData    = JSON.parse(localStorage.getItem('miyagiQuests'))        || {};
+let achievements = JSON.parse(localStorage.getItem('miyagiAchievements'))  || {};
+let sortMode='order', filterMode='all', tradeOffer=null, isOnCooldown=false;
 
-function saveState(){ /* unchanged */ }
-function toast(msg,type='info',dur=3200){ /* unchanged */ }
-let _actx=null; function ac(){ /* unchanged */ }
-function playTone(f,type='sine',vol=0.3,dur=0.15){ /* unchanged */ }
-function sfxOpen(){ /* unchanged */ } function sfxCommon(){ /* unchanged */ } function sfxRare(){ /* unchanged */ } function sfxGod(){ /* unchanged */ } function sfxReward(){ /* unchanged */ } function sfxError(){ /* unchanged */ }
-const cnv=document.getElementById('particleCanvas'),pctx=cnv.getContext('2d'); let parts=[]; function resizeCnv(){ /* unchanged */ } window.addEventListener('resize',resizeCnv); resizeCnv(); function spawnParts(n,colors,x,y){ /* unchanged */ } function loopParts(){ /* unchanged */ } loopParts();
-function getLevel(v){ return Math.floor(v/XP_PER_LEVEL)+1; } function getXPInLevel(v){ return v%XP_PER_LEVEL; } function updateXPBar(){ /* unchanged */ } function addXP(amt){ /* unchanged */ }
-function updatePityUI(){ /* unchanged */ }
-function navigate(page){ /* unchanged */ }
-function updateTimer(){ /* unchanged */ }
-function updateCollectionCount(){ /* unchanged */ }
-function rCls(c){ /* unchanged */ } function hCls(c){ /* unchanged */ } function aCls(c){ /* unchanged */ } function badgeHTML(c){ /* unchanged */ }
-function triggerCinematic(card){ /* unchanged */ } function closeCinematic(){ /* unchanged */ }
-function showCardModal(card){ /* unchanged */ } function closeModal(){ /* unchanged */ }
-function showRedeemModal(){ /* unchanged */ } function closeRedeemModal(){ /* unchanged */ }
-function redeemCode(){ /* unchanged */ }
-function sortedCollection(){ /* unchanged */ } function renderCollection(){ /* unchanged */ } function sortCollection(m){ /* unchanged */ }
-function renderAllCards(){ /* unchanged */ } function filterCards(m){ /* unchanged */ }
-function timeAgo(ts){ /* unchanged */ } function renderPullHistory(){ /* unchanged */ }
-function getTodayKey(){ /* unchanged */ } function initQuests(){ /* unchanged */ } function checkQuestProgress(stat,amt){ /* unchanged */ } function renderQuestsPage(){ /* unchanged */ }
-const ACHV=[ /* unchanged */ ]; function checkAchievement(id,cond){ /* unchanged */ } function checkAllAchievements(){ /* unchanged */ } function renderAchievements(){ /* unchanged */ }
-function updateHomePage(){ /* unchanged */ }
-function renderStats(){ /* unchanged */ } function drawPie(common,special,god,missing){ /* unchanged */ }
-function renderTradePage(){ /* unchanged */ } function selectOffer(id,card,el){ /* unchanged */ } function confirmTrade(){ /* unchanged */ }
+function saveState(){
+    localStorage.setItem('miyagiCollection',   JSON.stringify(collection));
+    localStorage.setItem('miyagiPulls',        pullCount);
+    localStorage.setItem('miyagiPity',         pityCount);
+    localStorage.setItem('miyagiXP',           xp);
+    localStorage.setItem('miyagiHistory',      JSON.stringify(pullHistory));
+    localStorage.setItem('miyagiQuests',       JSON.stringify(questData));
+    localStorage.setItem('miyagiAchievements', JSON.stringify(achievements));
+    localStorage.setItem('lastPackTime',       lastPackTime);
+}
 
-/* ADMIN PANEL */
-function openAdminPanel(){ /* unchanged */ } function closeAdminPanel(){ /* unchanged */ } function checkAdminPass(){ /* unchanged */ } function adminTab(tab){ /* unchanged */ } function previewCard(){ /* unchanged */ }
-function renderAdminRewardList(){ /* unchanged */ } function addReward(){ /* unchanged */ } function removeReward(id){ /* unchanged */ }
+/* ── TOAST ── */
+function toast(msg,type='info',dur=3200){
+    const c=document.getElementById('toastContainer');
+    const el=document.createElement('div');
+    el.className=`toast toast-${type}`; el.innerHTML=msg; c.appendChild(el);
+    setTimeout(()=>{ el.classList.add('out'); setTimeout(()=>el.remove(),400); },dur);
+}
 
-/* ── UPDATED CARD FUNCTIONS ── */
+/* ── WEB AUDIO ── */
+let _actx=null;
+function ac(){ if(!_actx)_actx=new(window.AudioContext||window.webkitAudioContext)(); return _actx; }
+function playTone(f,type='sine',vol=0.3,dur=0.15){
+    try{ const ctx=ac(),o=ctx.createOscillator(),g=ctx.createGain();
+        o.connect(g);g.connect(ctx.destination);
+        o.type=type;o.frequency.value=f;
+        g.gain.setValueAtTime(vol,ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur);
+        o.start();o.stop(ctx.currentTime+dur);
+    }catch(e){} }
+function sfxOpen()   { playTone(300,'sawtooth',.2,.1); setTimeout(()=>playTone(500,'sine',.3,.2),80); }
+function sfxCommon() { playTone(440,'sine',.3,.15); setTimeout(()=>playTone(550,'sine',.25,.2),120); }
+function sfxRare()   { [300,400,600,800].forEach((f,i)=>setTimeout(()=>playTone(f,'sine',.35,.25),i*80)); }
+function sfxGod()    { [200,300,500,700,1000,1400].forEach((f,i)=>setTimeout(()=>playTone(f,'sine',.4,.4),i*100)); }
+function sfxReward() { [500,600,700].forEach((f,i)=>setTimeout(()=>playTone(f,'triangle',.3,.2),i*100)); }
+function sfxError()  { playTone(150,'sawtooth',.25,.3); }
+
+/* ── PARTICLES ── */
+const cnv=document.getElementById('particleCanvas'),pctx=cnv.getContext('2d');
+let parts=[];
+function resizeCnv(){ cnv.width=window.innerWidth; cnv.height=window.innerHeight; }
+window.addEventListener('resize',resizeCnv); resizeCnv();
+function spawnParts(n,colors,x,y){
+    for(let i=0;i<n;i++){
+        const a=Math.random()*Math.PI*2,sp=4+Math.random()*12;
+        parts.push({x:x||cnv.width/2,y:y||cnv.height/3,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-3,
+            color:colors[Math.floor(Math.random()*colors.length)],
+            life:1,decay:.015+Math.random()*.02,size:4+Math.random()*8,rot:Math.random()*360,rotV:(Math.random()-.5)*12});
+    }
+}
+function loopParts(){
+    pctx.clearRect(0,0,cnv.width,cnv.height);
+    parts=parts.filter(p=>p.life>0);
+    parts.forEach(p=>{ p.x+=p.vx;p.y+=p.vy;p.vy+=.3;p.life-=p.decay;p.rot+=p.rotV;
+        pctx.save();pctx.globalAlpha=Math.max(0,p.life);
+        pctx.translate(p.x,p.y);pctx.rotate(p.rot*Math.PI/180);
+        pctx.fillStyle=p.color;pctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+        pctx.restore(); });
+    requestAnimationFrame(loopParts);
+}
+loopParts();
+
+/* ── XP / LEVEL ── */
+function getLevel(v){ return Math.floor(v/XP_PER_LEVEL)+1; }
+function getXPInLevel(v){ return v%XP_PER_LEVEL; }
+function updateXPBar(){
+    document.getElementById('xpBar').style.width=(getXPInLevel(xp)/XP_PER_LEVEL*100)+'%';
+    document.getElementById('levelLabel').textContent=`LVL ${getLevel(xp)}`;
+    document.getElementById('xpLabel').textContent=`${getXPInLevel(xp)}/${XP_PER_LEVEL} XP`;
+}
+function addXP(amt){
+    const old=getLevel(xp); xp+=amt; const nw=getLevel(xp);
+    updateXPBar();
+    if(nw>old){ toast(`🎉 LEVEL UP! You are now Level ${nw}!`,'gold',4000); sfxGod();
+        spawnParts(90,['#ffd700','#f97316','#fff','#ec4899']); checkAchievement('level5',nw>=5); checkAchievement('level10',nw>=10); }
+}
+
+/* ── PITY ── */
+function updatePityUI(){
+    ['pityPips','packPityPips'].forEach(id=>{
+        const el=document.getElementById(id); if(!el)return; el.innerHTML='';
+        for(let i=0;i<PITY_MAX;i++){
+            const p=document.createElement('div');
+            p.className='pity-pip'+(i<pityCount?' filled':''); el.appendChild(p); }
+    });
+}
+
+/* ── NAVIGATION ── */
+function navigate(page){
+    document.querySelectorAll('.page').forEach(p=>p.classList.add('hidden'));
+    document.getElementById(`page-${page}`).classList.remove('hidden');
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.page)===page));
+    if(page===0) updateHomePage();
+    if(page===1) renderCollection();
+    if(page===3) renderAllCards();
+    if(page===4) renderQuestsPage();
+    if(page===5) renderTradePage();
+    if(page===6) renderStats();
+    if(page===4) checkQuestProgress('view',1);
+}
+
+/* ── TIMER ── */
+function updateTimer(){
+    const rem=COOLDOWN_MS-(Date.now()-lastPackTime);
+    const rb=document.getElementById('readyBox'),rt=document.getElementById('readyText'),pc=document.getElementById('packCooldownText');
+    if(rem<=0){
+        rt.textContent='READY!'; if(pc)pc.textContent='Pack ready!';
+        rb.style.cssText='background:#22c55e;border-color:#4ade80;color:#000'; return true;
+    }
+    const min=Math.floor(rem/60000),sec=Math.floor((rem%60000)/1000);
+    const lbl=`${min}:${sec<10?'0':''}${sec}`;
+    rt.textContent=lbl; if(pc)pc.textContent=`Next pack in ${lbl}`;
+    rb.style.cssText='background:#dc2626;border-color:#f87171;color:#fff'; return false;
+}
+function updateCollectionCount(){
+    document.getElementById('collectionCount').textContent=`${collection.length}/${allCards.length}`;
+    const el=document.getElementById('homeTotalCards'); if(el)el.textContent=allCards.length;
+}
+
+/* ── CARD HELPERS ── */
+function rCls(c){ return c.rare==='god'?'god-rare':c.rare==='special'?'special':''; }
+function hCls(c){ return c.landscape?'star-holo':'holo'; }
+function aCls(c){ return c.landscape?'aspect-[7/5]':'aspect-[5/7]'; }
+function badgeHTML(c){
+    if(c.rare==='god')     return `<div class="rarity-badge badge-god">✨ GOD RARE</div>`;
+    if(c.rare==='special') return `<div class="rarity-badge badge-special">💜 SPECIAL</div>`;
+    return `<div class="rarity-badge badge-common">◆ COMMON</div>`;
+}
+
+/* ── PACK OPENER ── */
+function openPack(){
+    if(isOnCooldown||!updateTimer()){ toast("⏳ Pack not ready! Check the timer.",'error'); sfxError(); return; }
+    isOnCooldown=true; lastPackTime=Date.now(); pullCount++; saveState(); sfxOpen();
+    const pa=document.getElementById('packArea'),oa=document.getElementById('openedPack'),ab=document.getElementById('openAgainBtn');
+    pa.classList.add('hidden'); oa.classList.remove('hidden');
+    oa.style.cssText='display:flex;flex-direction:column;align-items:center;gap:20px;'; oa.innerHTML='';
+
+    let card;
+    if(pityCount>=PITY_MAX-1){
+        const pool=allCards.filter(c=>c.rare!=='common');
+        card=pool[Math.floor(Math.random()*pool.length)]; pityCount=0;
+    } else {
+        const roll=Math.random();
+        let pool;
+        if(roll<.05)      pool=allCards.filter(c=>c.rare==='god');
+        else if(roll<.15) pool=allCards.filter(c=>c.rare==='special');
+        else              pool=allCards.filter(c=>c.rare==='common');
+        if(!pool||!pool.length) pool=allCards;
+        card=pool[Math.floor(Math.random()*pool.length)];
+        if(card.rare==='common') pityCount++; else pityCount=0;
+    }
+
+    const xpGain=card.rare==='god'?XP_PER_RARE*3:card.rare==='special'?XP_PER_RARE:XP_PER_PULL;
+    addXP(xpGain);
+    const isNew=!collection.includes(card.id);
+    if(isNew) collection.push(card.id);
+    pullHistory.unshift({id:card.id,time:Date.now(),isNew});
+    if(pullHistory.length>50) pullHistory.pop();
+    saveState(); updateCollectionCount(); updatePityUI();
+    checkQuestProgress('pull',1); checkAllAchievements();
+
+    const div=document.createElement('div');
+    div.className=`card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden cursor-pointer reveal-card ${rCls(card)} ${hCls(card)} w-full max-w-md`;
+    div.innerHTML=`
+        <div class="card-thumb ${aCls(card)} relative">
+            <img src="${card.image}" draggable="false" onerror="this.src='https://placehold.co/600x400/4f46e5/fff?text=Missing'">
+            ${badgeHTML(card)}
+            ${isNew?'<div class="new-badge">NEW!</div>':''}
+        </div>
+        <div class="p-5 text-center">
+            <div class="text-3xl">${card.name}</div>
+            <div class="text-yellow-300 text-xl mt-1">${card.number}</div>
+            <div class="text-purple-300 text-lg mt-1">CODE: ${card.code}</div>
+            <div class="text-green-400 text-xl mt-2">+${xpGain} XP</div>
+        </div>`;
+    div.onclick=(e)=>{ e.preventDefault(); e.stopPropagation(); showCardModal(card); };
+    oa.appendChild(div); ab.classList.remove('hidden');
+
+    setTimeout(()=>{ div.classList.add('flipped'); setTimeout(()=>div.classList.add('settled'),1100); },150);
+
+    if(card.rare==='god'){ sfxGod(); setTimeout(()=>triggerCinematic(card),1200); }
+    else if(card.rare==='special'){ sfxRare(); spawnParts(60,['#c026d3','#a855f7','#ec4899','#fff']); toast(`💜 SPECIAL PULL: ${card.name}!`,'info',4000); }
+    else { sfxCommon(); spawnParts(25,['#ffd700','#fff','#f97316']); if(isNew) toast(`✨ New card! ${card.name}`,'success'); else toast(`Got ${card.name} (duplicate)`,'info'); }
+
+    renderPullHistory(); isOnCooldown=false; updateTimer();
+}
+
+function claimDailyPack(){ navigate(2); setTimeout(openPack,100); }
+function resetPackArea(){
+    document.getElementById('packArea').classList.remove('hidden');
+    document.getElementById('openedPack').classList.add('hidden');
+    document.getElementById('openedPack').style.cssText='';
+    document.getElementById('openAgainBtn').classList.add('hidden');
+}
+
+/* ── GOD-RARE CINEMATIC ── */
+function triggerCinematic(card){
+    const fl=document.getElementById('flashOverlay');
+    fl.classList.add('flash'); setTimeout(()=>fl.classList.remove('flash'),300);
+    spawnParts(150,['#ffd700','#ff8c00','#fff','#f97316','#ffec99'],cnv.width/2,cnv.height/3);
+    const ov=document.getElementById('cinematicOverlay'),cc=document.getElementById('cinematicCard');
+    cc.innerHTML=`<div class="card god-rare holo bg-black border-8 border-yellow-400 rounded-3xl overflow-hidden">
+        <div class="relative">
+            <img src="${card.image}" class="w-full object-cover" draggable="false" style="pointer-events:none" onerror="this.src='https://placehold.co/600x400/4f46e5/fff?text=Missing'">
+            ${badgeHTML(card)}
+        </div>
+        <div class="p-4 text-center"><div class="text-2xl text-yellow-300">${card.name}</div></div></div>`;
+    ov.classList.add('active');
+    toast(`🌟 GOD RARE PULLED! ${card.name}`,'gold',6000);
+}
+function closeCinematic(){ document.getElementById('cinematicOverlay').classList.remove('active'); }
+
+/* ── CARD MODAL (FIXED — no navigation bug) ── */
+function showCardModal(card){
+    const owned=collection.includes(card.id);
+    const inner=document.getElementById('cardModalInner');
+    inner.style.borderColor=card.rare==='god'?'#ffd700':card.rare==='special'?'#c026d3':'#fbbf24';
+    const img=document.getElementById('modalImage');
+    img.src=''; // reset first to prevent flicker
+    img.src=card.image;
+    img.draggable=false;
+    img.onerror=()=>{ img.src='https://placehold.co/600x400/4f46e5/fff?text=Missing'; };
+    if(card.landscape) img.classList.add('landscape-modal'); else img.classList.remove('landscape-modal');
+    document.getElementById('modalName').textContent=card.name;
+    document.getElementById('modalNumber').textContent=card.number;
+    document.getElementById('modalCode').textContent=owned?`CODE: ${card.code}`:'CODE: ???';
+    const b=document.getElementById('modalRarityBadge');
+    b.className='rarity-badge '+(card.rare==='god'?'badge-god':card.rare==='special'?'badge-special':'badge-common');
+    b.textContent=RARITY_LABELS[card.rare]||'COMMON';
+    document.getElementById('modalOwned').innerHTML=owned
+        ?`<span class="bg-green-500/20 border border-green-500 text-green-400 px-4 py-1 rounded-full text-xl">✓ IN YOUR COLLECTION</span>`
+        :`<span class="bg-zinc-800 border border-zinc-600 text-zinc-400 px-4 py-1 rounded-full text-xl">NOT YET COLLECTED</span>`;
+    const m=document.getElementById('cardModal');
+    m.classList.remove('hidden'); m.style.display='flex';
+}
+function closeModal(){
+    const m=document.getElementById('cardModal');
+    m.classList.add('hidden'); m.style.display='';
+}
+// Close modal on backdrop click
+document.getElementById('cardModal').addEventListener('click',function(e){
+    if(e.target===this) closeModal();
+});
+
+/* ── REDEEM MODAL ── */
+function showRedeemModal(){
+    const m=document.getElementById('redeemModal');
+    m.classList.remove('hidden'); m.style.display='flex';
+    document.getElementById('redeemInput').focus();
+}
+function closeRedeemModal(){
+    const m=document.getElementById('redeemModal');
+    m.classList.add('hidden'); m.style.display='';
+    document.getElementById('redeemInput').value='';
+}
+document.getElementById('redeemModal').addEventListener('click',function(e){
+    if(e.target===this) closeRedeemModal();
+});
+
+/* ── REDEEM CODE (handles both card codes and reward codes) ── */
+function redeemCode(){
+    const input=document.getElementById('redeemInput').value.trim().toUpperCase();
+    if(!input){ toast("Enter a code first!",'error'); return; }
+
+    // Check reward cards
+    const reward=rewardCards.find(r=>r.code===input);
+    if(reward){
+        if(redeemedRewards.includes(reward.id)){
+            toast("⚠️ This reward has already been claimed on this device!",'info',4000);
+            closeRedeemModal(); return;
+        }
+        redeemedRewards.push(reward.id);
+        saveRewards(); closeRedeemModal();
+        sfxGod(); spawnParts(100,['#22c55e','#ffd700','#fff','#ec4899','#86efac']);
+        showRewardModal(reward); return;
+    }
+
+    // Check regular card codes
+    const card=allCards.find(c=>c.code===input);
+    if(!card){ toast("❌ Invalid code!",'error'); sfxError(); return; }
+    if(collection.includes(card.id)){ toast("⚠️ Already own this card!",'info'); closeRedeemModal(); return; }
+    collection.push(card.id); addXP(XP_PER_PULL);
+    checkQuestProgress('redeem',1); saveState(); updateCollectionCount();
+    closeRedeemModal(); sfxReward();
+    toast(`✅ Unlocked: ${card.name} (+${XP_PER_PULL} XP)`,'success',4000);
+    showCardModal(card); checkAllAchievements(); checkAchievement('redeem_one',true);
+}
+
+/* ── REWARD MODAL ── */
+function showRewardModal(reward){
+    const img=document.getElementById('rewardImg');
+    img.style.display='block';
+    img.src=reward.image||'https://placehold.co/400x300/16a34a/fff?text=REWARD';
+    img.onerror=()=>{ img.style.display='none'; };
+    document.getElementById('rewardName').textContent=reward.name;
+    document.getElementById('rewardDesc').textContent=reward.description||'Enjoy your reward!';
+    document.getElementById('rewardModal').classList.add('show');
+}
+function closeRewardModal(){
+    document.getElementById('rewardModal').classList.remove('show');
+}
+
+/* ── COLLECTION ── */
+function sortedCollection(){
+    let ids=[...collection];
+    if(sortMode==='name')   ids.sort((a,b)=>{ const ca=allCards.find(c=>c.id===a),cb=allCards.find(c=>c.id===b); return (ca?.name||'').localeCompare(cb?.name||''); });
+    if(sortMode==='rarity') ids.sort((a,b)=>{ const o={god:0,special:1,common:2}; const ca=allCards.find(c=>c.id===a),cb=allCards.find(c=>c.id===b); return (o[ca?.rare]??2)-(o[cb?.rare]??2); });
+    return ids;
+}
+function renderCollection(){
+    const grid=document.getElementById('collectionGrid'); grid.innerHTML='';
+    const ids=sortedCollection();
+    if(!ids.length){ grid.innerHTML=`<div class="col-span-full text-center py-20 text-4xl text-yellow-300">No cards yet… open packs!</div>`; updateCollectionCount(); return; }
+    ids.forEach(id=>{
+        const card=allCards.find(c=>c.id===id); if(!card)return;
+        const div=document.createElement('div');
+        div.className=`card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden ${rCls(card)} ${hCls(card)}`;
+        div.innerHTML=`<div class="card-thumb ${aCls(card)} relative">
+            <img src="${card.image}" draggable="false" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Missing'">
+            ${badgeHTML(card)}</div>
+            <div class="p-3 text-center"><div class="text-xl leading-tight">${card.name}</div>
+            <div class="text-yellow-300 text-lg">${card.number}</div></div>`;
+        div.onclick=(e)=>{ e.preventDefault(); e.stopPropagation(); showCardModal(card); };
+        grid.appendChild(div);
+    });
+    updateCollectionCount();
+    document.getElementById('progress').textContent=`(${collection.length}/${allCards.length})`;
+    document.querySelectorAll('[id^="sort-"]').forEach(b=>b.classList.remove('active'));
+    const sb=document.getElementById('sort-'+sortMode); if(sb)sb.classList.add('active');
+}
+function sortCollection(m){ sortMode=m; renderCollection(); }
+
+/* ── ALL CARDS (FIXED — all cards are now clickable) ── */
+function renderAllCards(){
+    const grid=document.getElementById('allCardsGrid'); grid.innerHTML='';
+    let cards=[...allCards];
+    if(filterMode==='owned')   cards=cards.filter(c=>collection.includes(c.id));
+    if(filterMode==='missing') cards=cards.filter(c=>!collection.includes(c.id));
+    const oc=allCards.filter(c=>collection.includes(c.id)).length;
+    document.getElementById('ownedLabel').textContent=`${oc}/${allCards.length} owned`;
+    document.querySelectorAll('[id^="filter-"]').forEach(b=>b.classList.remove('active'));
+    const fb=document.getElementById('filter-'+filterMode); if(fb)fb.classList.add('active');
+    cards.forEach(card=>{
+        const owned=collection.includes(card.id);
+        const div=document.createElement('div');
+        div.className=`card bg-black/80 border-4 border-yellow-400 rounded-3xl overflow-hidden ${owned?rCls(card):''} ${owned?hCls(card):''}`;
+        div.innerHTML=`<div class="card-thumb ${aCls(card)} relative" style="${owned?'':'filter:brightness(.2)grayscale(1)'}">
+            <img src="${card.image}" draggable="false" onerror="this.src='https://placehold.co/400x560/4f46e5/fff?text=Missing'">
+            ${owned?badgeHTML(card):''}</div>
+            <div class="p-3 text-center">
+            <div class="text-xl leading-tight ${owned?'':'text-zinc-700'}">${owned?card.name:'???'}</div>
+            <div class="${owned?'text-yellow-300':'text-zinc-800'} text-lg">${owned?card.number:'#/100'}</div></div>`;
+        // ALL cards get onclick — fixes navigation bug
+        div.onclick=(e)=>{ e.preventDefault(); e.stopPropagation(); showCardModal(card); };
+        grid.appendChild(div);
+    });
+}
+function filterCards(m){ filterMode=m; renderAllCards(); }
+
+/* ── PULL HISTORY ── */
+function timeAgo(ts){ const d=Date.now()-ts; if(d<60000)return 'Just now'; if(d<3600000)return `${Math.floor(d/60000)}m ago`; return `${Math.floor(d/3600000)}h ago`; }
+function renderPullHistory(){
+    const c=document.getElementById('pullHistory'); if(!c)return;
+    if(!pullHistory.length){ c.innerHTML='<p class="text-zinc-700 text-xl">No pulls yet</p>'; return; }
+    c.innerHTML=pullHistory.slice(0,8).map(h=>{
+        const card=allCards.find(c=>c.id===h.id); if(!card)return '';
+        const ico=card.rare==='god'?'✨':card.rare==='special'?'💜':'◆';
+        return `<div class="history-item"><img class="history-thumb" src="${card.image}" draggable="false" onerror="this.src='https://placehold.co/46x46/4f46e5/fff?text=?'">
+            <div class="flex-1"><div class="text-xl">${ico} ${card.name}</div><div class="text-zinc-600 text-lg">${timeAgo(h.time)}</div></div>
+            ${h.isNew?'<div class="new-badge" style="position:static;animation:none;font-size:11px;padding:2px 8px">NEW</div>':''}</div>`;
+    }).join('');
+}
+
+/* ── QUESTS ── */
+const QUESTS=[
+    {id:'q_pull3',    label:'Open 3 Packs',    icon:'📦',target:3, stat:'pull',   xp:100},
+    {id:'q_redeem',   label:'Redeem a Code',   icon:'🎫',target:1, stat:'redeem', xp:60},
+    {id:'q_collect5', label:'Collect 5 Cards', icon:'🃏',target:5, stat:'collect',xp:80},
+    {id:'q_view',     label:'Browse All Cards',icon:'👁️',target:1, stat:'view',   xp:40},
+];
+function getTodayKey(){ return new Date().toISOString().slice(0,10); }
+function initQuests(){
+    const today=getTodayKey();
+    if(questData.date!==today){ questData={date:today,progress:{},done:{},streak:questData.streak||0}; }
+}
+function checkQuestProgress(stat,amt){
+    initQuests();
+    QUESTS.forEach(q=>{
+        if(q.stat!==stat||questData.done[q.id])return;
+        questData.progress[q.id]=Math.min((questData.progress[q.id]||0)+amt,q.target);
+        if(questData.progress[q.id]>=q.target){
+            questData.done[q.id]=true; addXP(q.xp); sfxReward();
+            spawnParts(50,['#22c55e','#ffd700','#fff']);
+            toast(`✅ Quest Complete: ${q.label} (+${q.xp} XP)!`,'success',4000);
+        }
+    });
+    if(stat==='pull'){ initQuests(); questData.progress['q_collect5']=collection.length; if(collection.length>=5&&!questData.done['q_collect5']){ questData.done['q_collect5']=true; addXP(80); toast('✅ Quest Complete: Collect 5 Cards (+80 XP)!','success',4000); } }
+    saveState();
+    if(!document.getElementById('page-4').classList.contains('hidden')) renderQuestsPage();
+}
+function renderQuestsPage(){
+    initQuests();
+    document.getElementById('questStreak').textContent=questData.streak?`${questData.streak} DAY STREAK 🔥`:'';
+    const grid=document.getElementById('questsGrid');
+    grid.innerHTML=QUESTS.map(q=>{
+        const prog=questData.progress[q.id]||0,done=questData.done[q.id]||false;
+        const pct=Math.min(100,(prog/q.target)*100);
+        const barClr=done?'bg-gradient-to-r from-green-500 to-emerald-400':'bg-gradient-to-r from-yellow-500 to-orange-400';
+        return `<div class="quest-card bg-black/80 rounded-3xl p-6 ${done?'done':''}">
+            <div class="flex items-center gap-4 mb-3"><span class="text-4xl">${q.icon}</span>
+            <div><div class="text-2xl">${q.label}</div><div class="text-yellow-400 text-xl">+${q.xp} XP reward</div></div>
+            <div class="ml-auto text-3xl">${done?'✅':''}</div></div>
+            <div class="quest-progress mb-2"><div class="${barClr} quest-bar" style="width:${pct}%"></div></div>
+            <div class="text-right text-xl ${done?'text-green-400':'text-zinc-500'}">${done?'COMPLETE!':prog+'/'+q.target}</div></div>`;
+    }).join('');
+    renderAchievements();
+}
+
+/* ── ACHIEVEMENTS ── */
+const ACHV=[
+    {id:'first_pull',label:'First Pull',  icon:'🎴',desc:'Open your first pack'},
+    {id:'full_set',  label:'Full Set',    icon:'👑',desc:`Collect all cards`},
+    {id:'god_pull',  label:'God Touched', icon:'✨',desc:'Pull the God Rare card'},
+    {id:'level5',    label:'Level 5',     icon:'⚡',desc:'Reach level 5'},
+    {id:'level10',   label:'Ascended',    icon:'🌟',desc:'Reach level 10'},
+    {id:'redeem_one',label:'Code Cracker',icon:'🎫',desc:'Redeem a card code'},
+    {id:'pull10',    label:'Pack Addict', icon:'📦',desc:'Open 10 packs'},
+    {id:'pull50',    label:'Hive Legend', icon:'🐝',desc:'Open 50 packs'},
+];
+function checkAchievement(id,cond){
+    if(!cond||achievements[id])return;
+    achievements[id]=Date.now(); saveState();
+    const a=ACHV.find(x=>x.id===id);
+    toast(`🏅 Achievement: ${a?.label}!`,'gold',5000); sfxReward();
+    spawnParts(60,['#ffd700','#fff','#f97316']);
+}
+function checkAllAchievements(){
+    checkAchievement('first_pull',pullCount>=1);
+    checkAchievement('full_set',  collection.length>=allCards.length);
+    checkAchievement('god_pull',  collection.includes('god-rare'));
+    checkAchievement('level5',    getLevel(xp)>=5);
+    checkAchievement('level10',   getLevel(xp)>=10);
+    checkAchievement('pull10',    pullCount>=10);
+    checkAchievement('pull50',    pullCount>=50);
+}
+function renderAchievements(){
+    const grid=document.getElementById('achievementsGrid'); if(!grid)return;
+    grid.innerHTML=ACHV.map(a=>{
+        const u=!!achievements[a.id];
+        return `<div class="achievement bg-black/80 border-4 ${u?'border-yellow-400':'border-zinc-800'} rounded-3xl p-4 text-center ${u?'unlocked':''}">
+            <div class="text-5xl mb-2">${a.icon}</div>
+            <div class="text-xl ${u?'text-yellow-300':'text-zinc-600'}">${a.label}</div>
+            <div class="text-lg ${u?'text-zinc-400':'text-zinc-800'} mt-1">${a.desc}</div>
+            ${u?'<div class="text-green-400 text-lg mt-1">✓ UNLOCKED</div>':''}</div>`;
+    }).join('');
+}
+
+/* ── HOME ── */
+function updateHomePage(){
+    document.getElementById('homeCollected').textContent=collection.length;
+    document.getElementById('homePulls').textContent=pullCount;
+    document.getElementById('homeLevel').textContent=getLevel(xp);
+    const el=document.getElementById('homeAchievements');
+    const u=ACHV.filter(a=>achievements[a.id]);
+    el.innerHTML=u.map(a=>`<div title="${a.label}" class="text-4xl cursor-default" style="filter:drop-shadow(0 0 8px #ffd700)">${a.icon}</div>`).join('')||'';
+}
+
+/* ── STATS ── */
+function renderStats(){
+    const owned=allCards.filter(c=>collection.includes(c.id));
+    const godO=owned.filter(c=>c.rare==='god').length;
+    const specO=owned.filter(c=>c.rare==='special').length;
+    const comO=owned.filter(c=>c.rare==='common').length;
+    const landO=owned.filter(c=>c.landscape).length;
+    document.getElementById('statCommon').textContent=comO;
+    document.getElementById('statSpecial').textContent=specO;
+    document.getElementById('statGod').textContent=godO;
+    document.getElementById('statLandscape').textContent=landO;
+    document.getElementById('statTotalPulls').textContent=pullCount;
+    document.getElementById('statLevel').textContent=getLevel(xp);
+    document.getElementById('statXP').textContent=xp;
+    document.getElementById('statCompletion').textContent=Math.round(collection.length/allCards.length*100)+'%';
+    setTimeout(()=>{
+        const all_c=allCards.filter(c=>c.rare==='common').length;
+        const all_s=allCards.filter(c=>c.rare==='special').length;
+        const all_g=allCards.filter(c=>c.rare==='god').length;
+        document.getElementById('barCommon').style.width    =(all_c?comO/all_c*100:0)+'%';
+        document.getElementById('barSpecial').style.width   =(all_s?specO/all_s*100:0)+'%';
+        document.getElementById('barGod').style.width       =(all_g?godO/all_g*100:0)+'%';
+        document.getElementById('barLandscape').style.width =(landO/Math.max(allCards.filter(c=>c.landscape).length,1)*100)+'%';
+    },100);
+    drawPie(comO,specO,godO,allCards.length-collection.length);
+    const log=document.getElementById('fullPullLog');
+    if(!pullHistory.length){ log.innerHTML='<p class="text-zinc-700 text-xl">No pulls yet</p>'; return; }
+    log.innerHTML=pullHistory.map(h=>{
+        const card=allCards.find(c=>c.id===h.id); if(!card)return '';
+        const ico=card.rare==='god'?'✨ GOD RARE':card.rare==='special'?'💜 SPECIAL':'◆ COMMON';
+        return `<div class="history-item"><img class="history-thumb" src="${card.image}" draggable="false" onerror="this.src='https://placehold.co/46x46/4f46e5/fff?text=?'">
+            <div class="flex-1"><div class="text-xl">${card.name}</div><div class="text-zinc-600 text-lg">${ico} · ${timeAgo(h.time)}</div></div>
+            ${h.isNew?'<div class="new-badge" style="position:static;animation:none;font-size:11px;padding:2px 8px">NEW</div>':''}</div>`;
+    }).join('');
+}
+function drawPie(common,special,god,missing){
+    const cv=document.getElementById('rarityChart');
+    const ctx=cv.getContext('2d');
+    const cx=cv.width/2,cy=cv.height/2,r=Math.min(cx,cy)-20;
+    ctx.clearRect(0,0,cv.width,cv.height);
+    const data=[
+        {val:common, color:'#6b7280',label:'Common'},
+        {val:special,color:'#a855f7',label:'Special'},
+        {val:god,    color:'#ffd700',label:'God Rare'},
+        {val:missing,color:'#1f2937',label:'Missing'},
+    ].filter(d=>d.val>0);
+    if(!data.length){ ctx.fillStyle='#222'; ctx.beginPath(); ctx.arc(cx,cy,r,0,Math.PI*2); ctx.fill(); return; }
+    let start=-Math.PI/2;
+    const total=data.reduce((s,d)=>s+d.val,0);
+    data.forEach(d=>{ const sl=(d.val/total)*Math.PI*2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,start+sl); ctx.closePath(); ctx.fillStyle=d.color; ctx.fill(); ctx.strokeStyle='#060614'; ctx.lineWidth=3; ctx.stroke(); start+=sl; });
+    ctx.beginPath(); ctx.arc(cx,cy,r*.45,0,Math.PI*2); ctx.fillStyle='#060614'; ctx.fill();
+    ctx.fillStyle='#ffd700'; ctx.font=`bold ${r*.18}px VT323,monospace`; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(`${Math.round(collection.length/allCards.length*100)}%`,cx,cy-6);
+    ctx.fillStyle='#888'; ctx.font=`${r*.12}px VT323,monospace`; ctx.fillText('COMPLETE',cx,cy+r*.15);
+    document.getElementById('chartLegend').innerHTML=data.filter(d=>d.label!=='Missing').map(d=>`<div class="flex items-center gap-2 text-xl"><div style="width:13px;height:13px;border-radius:3px;background:${d.color}"></div>${d.label}: ${d.val}</div>`).join('');
+}
+
+/* ── TRADE ── */
+function renderTradePage(){
+    const grid=document.getElementById('tradeCollection'); grid.innerHTML='';
+    tradeOffer=null;
+    document.getElementById('tradeOffer').innerHTML='<p class="text-zinc-600 text-xl w-full text-center mt-4">Click a card below to offer</p>';
+    document.getElementById('tradeReceive').innerHTML='<p class="text-zinc-600 text-xl w-full text-center mt-4">Complete a trade to see</p>';
+    collection.forEach(id=>{
+        const card=allCards.find(c=>c.id===id); if(!card)return;
+        const div=document.createElement('div');
+        div.className='trade-mini';
+        div.innerHTML=`<img src="${card.image}" draggable="false" onerror="this.src='https://placehold.co/76x76/4f46e5/fff?text=?'" title="${card.name}">`;
+        div.onclick=(e)=>{ e.preventDefault(); e.stopPropagation(); selectOffer(id,card,div); };
+        grid.appendChild(div);
+    });
+    if(!collection.length) grid.innerHTML='<p class="text-zinc-600 text-xl col-span-full">Open packs first!</p>';
+}
+function selectOffer(id,card,el){
+    tradeOffer=id;
+    document.querySelectorAll('.trade-mini').forEach(m=>m.style.borderColor='rgba(255,215,0,.3)');
+    el.style.borderColor='#ffd700';
+    document.getElementById('tradeOffer').innerHTML=`
+        <div class="trade-mini" style="width:90px"><img src="${card.image}" draggable="false" style="pointer-events:none"></div>
+        <div class="mt-2 text-xl text-yellow-300">${card.name}</div>`;
+}
+function confirmTrade(){
+    if(!tradeOffer){ toast("Select a card to offer first!",'error'); return; }
+    const recv=allCards[Math.floor(Math.random()*allCards.length)];
+    collection=collection.filter(id=>id!==tradeOffer);
+    if(!collection.includes(recv.id)) collection.push(recv.id);
+    saveState(); updateCollectionCount(); sfxRare(); spawnParts(60,['#ffd700','#c026d3','#fff']);
+    toast(`🐝 Trade complete! Received: ${recv.name}`,'success',4000);
+    document.getElementById('tradeReceive').innerHTML=`
+        <div class="trade-mini" style="width:90px"><img src="${recv.image}" draggable="false" style="pointer-events:none"></div>
+        <div class="mt-2 text-xl text-purple-300">${recv.name}</div>`;
+    tradeOffer=null; setTimeout(renderTradePage,1800);
+}
+
+/* ══════════════════════════════════════
+   ADMIN PANEL
+══════════════════════════════════════ */
+let adminUnlocked=false;
+
+function openAdminPanel(){
+    const m=document.getElementById('adminModal');
+    m.classList.remove('hidden');
+    adminUnlocked=false;
+    document.getElementById('adminLock').classList.remove('hidden');
+    document.getElementById('adminContent').classList.add('hidden');
+    document.getElementById('adminPassInput').value='';
+}
+function closeAdminPanel(){
+    document.getElementById('adminModal').classList.add('hidden');
+}
+function checkAdminPass(){
+    if(document.getElementById('adminPassInput').value===ADMIN_PASS){
+        adminUnlocked=true;
+        document.getElementById('adminLock').classList.add('hidden');
+        document.getElementById('adminContent').classList.remove('hidden');
+        adminTab('reset');
+    } else {
+        toast("Wrong password!",'error'); sfxError();
+        document.getElementById('adminPassInput').value='';
+    }
+}
+function adminTab(tab){
+    ['reset','cards','rewards'].forEach(t=>{
+        const btn=document.getElementById('adminTabBtn-'+t);
+        const pane=document.getElementById('adminPane-'+t);
+        if(btn) btn.classList.toggle('active',t===tab);
+        if(pane) pane.classList.toggle('hidden',t!==tab);
+    });
+    if(tab==='cards')   renderAdminCardList();
+    if(tab==='rewards') renderAdminRewardList();
+}
+
+/* Card preview */
+function previewCard(){
+    const url=document.getElementById('newCardImage').value.trim();
+    if(!url){ toast("Enter an image URL first",'error'); return; }
+    const wrap=document.getElementById('cardPreviewWrap');
+    const img=document.getElementById('cardPreview');
+    img.src=url;
+    img.onerror=()=>{ img.src='https://placehold.co/200x280/4f46e5/fff?text=Error'; };
+    wrap.classList.remove('hidden');
+}
+
+/* Add custom card */
 function addCustomCard(){
     const name=document.getElementById('newCardName').value.trim();
     const rarity=document.getElementById('newCardRarity').value;
@@ -619,25 +1361,32 @@ function addCustomCard(){
     const rawCode=document.getElementById('newCardCode').value.trim().toUpperCase();
     const image=document.getElementById('newCardImage').value.trim();
     const landscape=document.getElementById('newCardLandscape').checked;
-    if(!name || !image){ toast("Name and Image URL required",'error'); return; }
+
+    if(!name){ toast("Card Name is required!",'error'); return; }
+    if(!image){ toast("Image URL is required!",'error'); return; }
+
     const id='custom-'+Date.now();
     const code=rawCode||'TTM-CUSTOM'+Date.now();
-    if(allCards.find(c=>c.code===code&&c.code!=='')){ toast("Code already in use",'error'); return; }
-    const card={id,name,rare:rarity,number,code,image,landscape,isCustom:true};
+
+    if(allCards.find(c=>c.code===code&&c.code!=='')){ toast("That redeem code is already in use!",'error'); return; }
+
+    const card={ id, name, rare:rarity, number, code, image, landscape, isCustom:true };
     customCards.push(card);
     allCards.push(card);
     localStorage.setItem('miyagiCustomCards',JSON.stringify(customCards));
-    ['newCardName','newCardNumber','newCardCode','newCardImage'].forEach(id=>document.getElementById(id).value='');
+
+    // Clear form
+    ['newCardName','newCardNumber','newCardCode','newCardImage'].forEach(fid=>document.getElementById(fid).value='');
     document.getElementById('newCardLandscape').checked=false;
     document.getElementById('newCardRarity').value='common';
     document.getElementById('cardPreviewWrap').classList.add('hidden');
+
     updateCollectionCount();
-    renderAllCards();
-    renderCollection();
     renderAdminCardList();
-    toast(`✅ "${name}" added to deck and pack roller!`,'success');
+    toast(`✅ "${name}" added to the deck!`,'success');
 }
 
+/* Remove custom card */
 function removeCustomCard(id){
     if(!confirm("Remove this card from the deck?")) return;
     customCards=customCards.filter(c=>c.id!==id);
@@ -646,50 +1395,111 @@ function removeCustomCard(id){
     collection=collection.filter(cid=>cid!==id);
     localStorage.setItem('miyagiCustomCards',JSON.stringify(customCards));
     saveState(); updateCollectionCount();
-    renderAllCards();
-    renderCollection();
     renderAdminCardList();
-    toast("Card removed from deck and pack roller.",'info');
+    toast("Card removed.",'info');
 }
 
-/* ── EXPORT FOR GITHUB ── */
-function exportCardsForGitHub(){
-    const code = `let allCards = ` + JSON.stringify(allCards, null, 2) + `;`;
-    document.getElementById('exportCode').textContent = code;
-    document.getElementById('exportModal').classList.add('show');
-}
-function copyExportCode(){
-    const code = document.getElementById('exportCode').textContent;
-    navigator.clipboard.writeText(code).then(()=>{ toast("✅ Copied! Paste into your GitHub index.html","success"); });
-}
-
-/* Render admin card list with export button */
+/* Render admin card list */
 function renderAdminCardList(){
     const el=document.getElementById('adminCardList');
     const lbl=document.getElementById('cardCountLabel');
     if(lbl) lbl.textContent=`${allCards.length} total (${customCards.length} custom)`;
     el.innerHTML=allCards.map(c=>`
         <div class="admin-card-row">
-            <img src="${c.image}" style="width:36px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;pointer-events:none" draggable="false" onerror="this.style.background='#4f46e5';this.src=''">
+            <img src="${c.image}" style="width:36px;height:48px;object-fit:cover;border-radius:6px;flex-shrink:0;pointer-events:none"
+                 draggable="false" onerror="this.style.background='#4f46e5';this.src=''">
             <div class="flex-1 min-w-0">
                 <div class="text-lg leading-tight truncate">${c.name}</div>
                 <div class="text-zinc-500 text-base">${c.rare.toUpperCase()} · ${c.number}</div>
                 <div class="text-zinc-700 text-sm truncate">CODE: ${c.code}</div>
             </div>
-            ${c.isCustom?`<button onclick="removeCustomCard('${c.id}')" class="text-red-400 hover:text-red-200 text-2xl px-1 flex-shrink-0 transition-colors">🗑</button>`:`<span class="text-zinc-700 text-sm flex-shrink-0">BASE</span>`}
-        </div>`).join('');
-    const exportBtn = document.createElement('button');
-    exportBtn.className = 'w-full mt-6 bg-yellow-400 hover:bg-yellow-300 text-black font-bold py-4 rounded-3xl text-xl flex items-center justify-center gap-2';
-    exportBtn.innerHTML = '📤 Export Updated Deck for GitHub';
-    exportBtn.onclick = exportCardsForGitHub;
-    el.parentElement.appendChild(exportBtn);
+            ${c.isCustom
+                ?`<button onclick="removeCustomCard('${c.id}')" class="text-red-400 hover:text-red-200 text-2xl px-1 flex-shrink-0 transition-colors" title="Remove card">🗑</button>`
+                :`<span class="text-zinc-700 text-sm flex-shrink-0">BASE</span>`}
+        </div>
+    `).join('');
 }
 
-/* INIT */
+/* ── REWARD ADMIN ── */
+function addReward(){
+    const name=document.getElementById('newRewardName').value.trim();
+    const code=document.getElementById('newRewardCode').value.trim().toUpperCase();
+    const desc=document.getElementById('newRewardDesc').value.trim();
+    const image=document.getElementById('newRewardImage').value.trim();
+
+    if(!name){ toast("Reward Name required!",'error'); return; }
+    if(!code){ toast("Unique Code required!",'error'); return; }
+    if(rewardCards.find(r=>r.code===code)){ toast("That code already exists!",'error'); return; }
+    if(allCards.find(c=>c.code===code)){ toast("That code is already used by a card!",'error'); return; }
+
+    const reward={
+        id:'reward-'+Date.now(),
+        name, description:desc,
+        image:image||'https://placehold.co/400x300/16a34a/fff?text=REWARD',
+        code
+    };
+    rewardCards.push(reward);
+    saveRewards();
+
+    ['newRewardName','newRewardCode','newRewardDesc','newRewardImage'].forEach(id=>document.getElementById(id).value='');
+    renderAdminRewardList();
+    toast(`✅ Reward "${name}" created!`,'success');
+}
+
+function removeReward(id){
+    if(!confirm("Delete this reward?")) return;
+    rewardCards=rewardCards.filter(r=>r.id!==id);
+    redeemedRewards=redeemedRewards.filter(rid=>rid!==id);
+    saveRewards();
+    renderAdminRewardList();
+    toast("Reward deleted.",'info');
+}
+
+function renderAdminRewardList(){
+    const el=document.getElementById('adminRewardList');
+    const lbl=document.getElementById('rewardCountLabel');
+    if(lbl) lbl.textContent=`${rewardCards.length} reward${rewardCards.length!==1?'s':''}`;
+    if(!rewardCards.length){
+        el.innerHTML='<p class="text-zinc-700 text-xl text-center py-6">No reward cards yet</p>'; return;
+    }
+    el.innerHTML=rewardCards.map(r=>{
+        const redeemed=redeemedRewards.includes(r.id);
+        return `<div class="admin-card-row">
+            <img src="${r.image}" style="width:44px;height:44px;object-fit:cover;border-radius:8px;flex-shrink:0;pointer-events:none"
+                 draggable="false" onerror="this.style.background='#166534'">
+            <div class="flex-1 min-w-0">
+                <div class="text-lg leading-tight">${r.name}</div>
+                <div class="text-green-400 text-base">CODE: ${r.code}</div>
+                ${r.description?`<div class="text-zinc-500 text-sm truncate">${r.description}</div>`:''}
+                ${redeemed?'<div class="text-yellow-500 text-sm">✓ ALREADY REDEEMED (this device)</div>':'<div class="text-green-700 text-sm">● Available</div>'}
+            </div>
+            <button onclick="removeReward('${r.id}')" class="text-red-400 hover:text-red-200 text-2xl px-1 flex-shrink-0 transition-colors" title="Delete reward">🗑</button>
+        </div>`;
+    }).join('');
+}
+
+/* ── RESET TOOLS ── */
+function resetEverything(){
+    if(!confirm("FULL RESET — wipes everything. Are you sure?"))return;
+    collection=[];lastPackTime=0;pullCount=0;pityCount=0;xp=0;pullHistory=[];questData={};achievements={};
+    saveState(); updateCollectionCount(); updateTimer(); updateXPBar(); updatePityUI();
+    closeAdminPanel(); toast("✅ Full reset complete.",'success');
+}
+function resetTimerOnly(){
+    lastPackTime=0; saveState(); updateTimer();
+    closeAdminPanel(); toast("⏱️ Timer reset! Pack is ready.",'success');
+}
+
+/* ── INIT ── */
 function init(){
     initQuests(); updateTimer(); updateCollectionCount(); updateXPBar(); updatePityUI(); renderPullHistory(); checkAllAchievements();
     setInterval(updateTimer,1000);
-    setInterval(()=>{ const el=document.getElementById('questResetTimer'); if(!el)return; const midnight=new Date(); midnight.setHours(24,0,0,0); const diff=midnight-Date.now(); const h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000); el.textContent=`Resets in ${h}h ${m}m`; },1000);
+    setInterval(()=>{
+        const el=document.getElementById('questResetTimer'); if(!el)return;
+        const midnight=new Date(); midnight.setHours(24,0,0,0);
+        const diff=midnight-Date.now(); const h=Math.floor(diff/3600000),m=Math.floor((diff%3600000)/60000);
+        el.textContent=`Resets in ${h}h ${m}m`;
+    },1000);
     navigate(0);
 }
 window.onload=init;
