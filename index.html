@@ -173,6 +173,17 @@
         </div>
     </div>
 
+    <!-- HELP SECTION WITH HIDDEN RESET -->
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 text-center">
+        <a onclick="toggleHelp()" class="text-yellow-400 hover:text-yellow-300 text-xl cursor-pointer underline">Help</a>
+        <div id="helpPanel" class="hidden mt-3 bg-black/80 border border-yellow-400 rounded-2xl p-4 flex flex-col gap-3 items-center">
+            <button onclick="resetEverything()" class="bg-red-500 hover:bg-red-600 text-white font-bold px-8 py-3 rounded-3xl text-lg flex items-center gap-2">
+                <i class="fa-solid fa-rotate-right"></i> RESET COLLECTION + TIMER
+            </button>
+            <p class="text-xs text-yellow-300 max-w-xs">This will clear your collection and timer for testing. Use only when needed.</p>
+        </div>
+    </div>
+
     <script>
         const USERNAME = "aquateen168";
         const allCards = [
@@ -202,6 +213,24 @@
             localStorage.setItem('lastPackTime', '0');
             updateTimer();
             alert("Timer reset!");
+        }
+
+        function resetEverything() {
+            if (confirm("Reset entire collection and timer? This cannot be undone.")) {
+                collection = [];
+                lastPackTime = 0;
+                localStorage.setItem('miyagiCollection', JSON.stringify(collection));
+                localStorage.setItem('lastPackTime', '0');
+                updateCollectionCount();
+                updateTimer();
+                alert("Collection and timer fully reset!");
+                toggleHelp();
+            }
+        }
+
+        function toggleHelp() {
+            const panel = document.getElementById('helpPanel');
+            panel.classList.toggle('hidden');
         }
 
         function navigate(page) {
@@ -289,7 +318,7 @@
                 openedArea.innerHTML = '';
 
                 const shuffled = [...allCards].sort(() => 0.5 - Math.random());
-                const card = shuffled[0];  // ONLY ONE CARD
+                const card = shuffled[0];  // SINGLE CARD ONLY
 
                 const div = document.createElement('div');
                 const rarity = card.rare === "god" ? 'god-rare god-holo' : (card.rare === "special" ? 'special special-holo' : '');
@@ -310,7 +339,6 @@
                 makeDraggable(div, true);
                 openedArea.appendChild(div);
 
-                // Flip with spin, then settle to perfect 0°
                 setTimeout(() => {
                     div.classList.add('flipped');
                     setTimeout(() => {
@@ -318,7 +346,6 @@
                     }, 1100);
                 }, 150);
 
-                // Add to collection
                 if (!collection.includes(card.id)) collection.push(card.id);
                 localStorage.setItem('miyagiCollection', JSON.stringify(collection));
 
