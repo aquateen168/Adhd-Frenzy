@@ -133,7 +133,7 @@
     <div id="page-5" class="page hidden">
         <h2 class="text-5xl mb-8">TRADE WITH THE HIVE</h2>
         
-        <!-- MINI COLLECTION - Click to Offer -->
+        <!-- MINI COLLECTION – Click to Offer -->
         <div class="mb-8">
             <h3 class="text-3xl mb-4 text-yellow-300">Your Collection – Click cards to add to offer</h3>
             <div id="miniCollection" class="grid grid-cols-4 md:grid-cols-6 gap-3 max-h-60 overflow-y-auto p-3 border-4 border-yellow-400 rounded-3xl bg-black/50"></div>
@@ -345,7 +345,7 @@
             const card = allCards.find(c => c.id === id);
             if (!card) return;
             const div = document.createElement('div');
-            div.className = `cursor-pointer border-2 border-yellow-400 rounded-xl overflow-hidden hover:border-pink-400`;
+            div.className = `cursor-pointer border-2 border-yellow-400 rounded-xl overflow-hidden hover:border-pink-400 transition-colors`;
             div.innerHTML = `
                 <img src="${card.image}" class="w-full h-24 object-cover" onerror="this.src='https://placehold.co/100x140/4f46e5/fff?text=?'">
                 <div class="text-xs p-1 text-center truncate">${card.name}</div>
@@ -380,7 +380,7 @@
             alert("Add at least one card to your offer first!");
             return;
         }
-        alert(`🐝 TRADE COMPLETE!\nYou offered ${myOffer.length} cards.\nThey have been removed from your collection (demo).`);
+        alert(`🐝 TRADE COMPLETE!\nYou offered ${myOffer.length} cards.\nThey have been removed from your collection (demo mode).`);
         collection = collection.filter(id => !myOffer.includes(id));
         localStorage.setItem('miyagiCollection', JSON.stringify(collection));
         renderCollection();
